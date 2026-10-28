@@ -50,15 +50,7 @@ public class GameController {
             return;
         } else {
 
-            if (key.equals(KeyCode.LEFT)) {
-                snek.move('L');
-            } else if (key.equals(KeyCode.RIGHT)) {
-                snek.move('R');
-            } else if (key.equals(KeyCode.UP)) {
-                snek.move('U');
-            } else if (key.equals(KeyCode.DOWN)) {
-                snek.move('D');
-            }
+            snek.move(KeyBindings.directionFor(key));
 
             if (!snek.getDead() && snek.ateCoin(coin)) {
                 powerCoin();

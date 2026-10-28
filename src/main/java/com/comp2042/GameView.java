@@ -148,8 +148,24 @@ public class GameView {
         drawHead(snek);
     }
 
+    /**
+     * Converts a heading into the rotation of the head and tail sprites, which face up
+     * when not rotated.
+     *
+     * @param direction the snake's heading
+     * @return the clockwise rotation in degrees
+     */
+    private static int rotationOf(Direction direction) {
+        return switch (direction) {
+            case UP -> 0;
+            case RIGHT -> 90;
+            case DOWN -> 180;
+            case LEFT -> 270;
+        };
+    }
+
     private void drawHead(Snake snek) {
-        headSprite.setRotate(snek.getSnakeDir());
+        headSprite.setRotate(rotationOf(snek.getHeading()));
         SnapshotParameters params = new SnapshotParameters();
         params.setFill(Color.TRANSPARENT);
         Image rotatedImage = headSprite.snapshot(params, null);
@@ -159,7 +175,7 @@ public class GameView {
     private void drawBody(Snake snek, Point point, int index) {
         Image rotatedImage;
         if (snek.getBody().size() <= 1) {
-            tailSprite.setRotate(snek.getSnakeDir());
+            tailSprite.setRotate(rotationOf(snek.getHeading()));
             SnapshotParameters params = new SnapshotParameters();
             params.setFill(Color.TRANSPARENT);
             rotatedImage = tailSprite.snapshot(params, null);

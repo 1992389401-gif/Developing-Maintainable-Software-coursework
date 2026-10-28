@@ -16,7 +16,7 @@ public class Snake {
     private boolean ignoreBorders = false;
     private boolean noBorder;
     private Obstacle obstacle;
-    private int snakeDir = 270;
+    private Direction heading = Direction.LEFT;
 
     public Snake(int x, int y, boolean noBorder, Obstacle obstacle) {
         this.obstacle = obstacle;
@@ -27,52 +27,21 @@ public class Snake {
         this.gy = y;
     }
 
-    public void move(char dir) {
+    /**
+     * Moves the head one cell in the given direction. The snake dies if it hits a solid
+     * border, an obstacle or its own body; on an open board it wraps to the opposite edge.
+     *
+     * @param direction the direction to move in
+     */
+    public void move(Direction direction) {
         body.add(new Point(head));
-        switch (dir) {
-            case 'U':
-                snakeDir = 0;
-                head.translate(0, -1);
-                if (borderControl() && (!ignoreBorders && !noBorder) || obstacle.getObstacles().contains(head)) {
-                    head.translate(0, 1);
-                    dead = true;
-                } else if (borderControl() && (ignoreBorders || noBorder)) {
-                    head.setLocation(head.getX(), gy - 1);
-                }
-                break;
-
-            case 'D':
-                snakeDir = 180;
-                head.translate(0, 1);
-                if (borderControl() && (!ignoreBorders && !noBorder) || obstacle.getObstacles().contains(head)) {
-                    head.translate(0, -1);
-                    dead = true;
-                } else if (borderControl() && (ignoreBorders || noBorder)) {
-                    head.setLocation(head.getX(), 0);
-                }
-                break;
-
-            case 'L':
-                snakeDir = 270;
-                head.translate(-1, 0);
-                if (borderControl() && (!ignoreBorders && !noBorder) || obstacle.getObstacles().contains(head)) {
-                    head.translate(1, 0);
-                    dead = true;
-                } else if (borderControl() && (ignoreBorders || noBorder)) {
-                    head.setLocation(gx - 1, head.getY());
-                }
-                break;
-
-            case 'R':
-                snakeDir = 90;
-                head.translate(1, 0);
-                if (borderControl() && (!ignoreBorders && !noBorder) || obstacle.getObstacles().contains(head)) {
-                    head.translate(-1, 0);
-                    dead = true;
-                } else if (borderControl() && (ignoreBorders || noBorder)) {
-                    head.setLocation(0, head.getY());
-                }
-                break;
+        heading = direction;
+        head.translate(direction.getDx(), direction.getDy());
+        if (borderControl() && (!ignoreBorders && !noBorder) || obstacle.getObstacles().contains(head)) {
+            head.translate(-direction.getDx(), -direction.getDy());
+            dead = true;
+        } else if (borderControl() && (ignoreBorders || noBorder)) {
+            head.setLocation(Math.floorMod(head.x, gx), Math.floorMod(head.y, gy));
         }
 
         if (body.size() > 4 && hitSelf() && !body.get(0).equals(head)) {
@@ -129,7 +98,13 @@ public class Snake {
         ignoreBorders = ign;
     }
 
-    public int getSnakeDir() {
-        return snakeDir;
+    /**
+     * Returns the direction of the snake's most recent move. A new snake heads left,
+     * because its tail starts to the right of its head.
+     *
+     * @return the current heading
+     */
+    public Direction getHeading() {
+        return heading;
     }
 }
