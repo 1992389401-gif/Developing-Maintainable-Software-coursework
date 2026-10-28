@@ -1,18 +1,14 @@
 package com.comp2042;
 
-import javafx.scene.paint.Color;
-
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 
 public class Snake {
-    private Color headColor = Color.web("2eb872");
-    private Color bodyColor = Color.web("a3de83");
     private boolean dead = false;
     private final Point head = new Point();
     private final ArrayList<Point> body = new ArrayList<>();
-    private final int gx;
-    private final int gy;
+    private final int width;
+    private final int height;
     private boolean ignoreBorders = false;
     private boolean noBorder;
     private Obstacle obstacle;
@@ -23,8 +19,8 @@ public class Snake {
         this.noBorder = noBorder;
         this.head.setLocation(x / 2, y / 2);
         this.body.add(new Point(x / 2 + 1, y / 2));
-        this.gx = x;
-        this.gy = y;
+        this.width = x;
+        this.height = y;
     }
 
     /**
@@ -40,7 +36,7 @@ public class Snake {
         head.translate(direction.getDx(), direction.getDy());
         if (borderControl()) {
             if (ignoreBorders || noBorder) {
-                head.setLocation(Math.floorMod(head.x, gx), Math.floorMod(head.y, gy));
+                head.setLocation(Math.floorMod(head.x, width), Math.floorMod(head.y, height));
             } else {
                 head.setLocation(previous);
                 dead = true;
@@ -87,7 +83,7 @@ public class Snake {
     }
 
     private boolean borderControl() {
-        return head.getX() < 0 || head.getY() < 0 || head.getX() >= gx || head.getY() >= gy;
+        return head.getX() < 0 || head.getY() < 0 || head.getX() >= width || head.getY() >= height;
     }
 
     public boolean hitSelf() {
@@ -102,15 +98,7 @@ public class Snake {
         return new Point(head);
     }
 
-    public Color getHeadColor() {
-        return headColor;
-    }
-
-    public Color getBodyColor() {
-        return bodyColor;
-    }
-
-    public boolean getDead() {
+    public boolean isDead() {
         return dead;
     }
 

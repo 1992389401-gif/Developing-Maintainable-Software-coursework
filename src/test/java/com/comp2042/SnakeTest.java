@@ -27,7 +27,7 @@ class SnakeTest {
     /** Moves one cell the way the game loop does: the tail is dropped unless a coin was eaten. */
     private static void step(Snake snake, Direction direction, Coin coin) {
         snake.move(direction);
-        if (!snake.getDead()) {
+        if (!snake.isDead()) {
             snake.ateCoin(coin);
         }
     }
@@ -93,7 +93,7 @@ class SnakeTest {
         assertEquals(new Point(10, 10), snake.getHead());
         assertEquals(List.of(new Point(11, 10)), snake.getBody());
         assertEquals(Direction.LEFT, snake.getHeading());
-        assertFalse(snake.getDead());
+        assertFalse(snake.isDead());
     }
 
     @ParameterizedTest(name = "move {0} -> head at ({1},{2})")
@@ -128,11 +128,11 @@ class SnakeTest {
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
 
         steps(snake, Direction.LEFT, farCoin, 10);
-        assertFalse(snake.getDead());
+        assertFalse(snake.isDead());
         assertEquals(new Point(0, 10), snake.getHead());
 
         step(snake, Direction.LEFT, farCoin);
-        assertTrue(snake.getDead());
+        assertTrue(snake.isDead());
         assertEquals(new Point(0, 10), snake.getHead());
     }
 
@@ -147,7 +147,7 @@ class SnakeTest {
 
         steps(snake, direction, farCoin, count);
 
-        assertFalse(snake.getDead());
+        assertFalse(snake.isDead());
         assertEquals(new Point(x, y), snake.getHead());
     }
 
@@ -158,7 +158,7 @@ class SnakeTest {
 
         steps(snake, Direction.LEFT, farCoin, 11);
 
-        assertFalse(snake.getDead());
+        assertFalse(snake.isDead());
         assertEquals(new Point(19, 10), snake.getHead());
     }
 
@@ -171,11 +171,11 @@ class SnakeTest {
         obstacle.getObstacles().add(new Point(19, 10));
         Snake snake = new Snake(SIZE, SIZE, true, obstacle);
         steps(snake, Direction.LEFT, farCoin, 10);   // head at the left edge, (0,10)
-        assertFalse(snake.getDead());
+        assertFalse(snake.isDead());
 
         step(snake, Direction.LEFT, farCoin);        // wraps to (19,10), the obstacle
 
-        assertTrue(snake.getDead());
+        assertTrue(snake.isDead());
         assertEquals(new Point(0, 10), snake.getHead());
     }
 
@@ -186,7 +186,7 @@ class SnakeTest {
 
         step(snake, Direction.LEFT, farCoin);
 
-        assertTrue(snake.getDead());
+        assertTrue(snake.isDead());
         assertEquals(new Point(10, 10), snake.getHead());
     }
 
@@ -199,10 +199,10 @@ class SnakeTest {
 
         step(snake, Direction.UP, farCoin);
         step(snake, Direction.RIGHT, farCoin);
-        assertFalse(snake.getDead());
+        assertFalse(snake.isDead());
 
         step(snake, Direction.DOWN, farCoin);                      // back down into (8,10)
-        assertTrue(snake.getDead());
+        assertTrue(snake.isDead());
     }
 
     /**
@@ -216,7 +216,7 @@ class SnakeTest {
 
         step(snake, Direction.RIGHT, farCoin);                     // into (10,10), which is not the tail
 
-        assertTrue(snake.getDead());
+        assertTrue(snake.isDead());
     }
 
     @Test
@@ -228,7 +228,7 @@ class SnakeTest {
 
         step(snake, Direction.DOWN, farCoin);                      // the head takes the tail's old cell
 
-        assertFalse(snake.getDead());
+        assertFalse(snake.isDead());
         assertEquals(new Point(10, 10), snake.getHead());
     }
 }

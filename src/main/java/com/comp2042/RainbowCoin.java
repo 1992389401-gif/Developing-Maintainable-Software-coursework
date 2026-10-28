@@ -2,8 +2,8 @@ package com.comp2042;
 
 public class RainbowCoin extends Coin {
 
-    public RainbowCoin(int x, int y, Snake snek, Obstacle obstacle) {
-        super(x, y, snek, obstacle);
+    public RainbowCoin(int x, int y, Snake snake, Obstacle obstacle) {
+        super(x, y, snake, obstacle);
     }
 
     public int getPoints() {

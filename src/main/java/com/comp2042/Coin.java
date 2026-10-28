@@ -1,6 +1,6 @@
 package com.comp2042;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -13,17 +13,17 @@ public class Coin {
      *
      * @param x        the board width in cells
      * @param y        the board height in cells
-     * @param snek     the snake, whose cells are not free
+     * @param snake     the snake, whose cells are not free
      * @param obstacle the obstacles, whose cells are not free
      * @throws IllegalStateException if no cell is free; the game should have been won by then
      */
-    public Coin(int x, int y, Snake snek, Obstacle obstacle) {
-        List<Point> body = snek.getBody();
+    public Coin(int x, int y, Snake snake, Obstacle obstacle) {
+        List<Point> body = snake.getBody();
         List<Point> free = new ArrayList<>();
         for (int px = 0; px < x; px++) {
             for (int py = 0; py < y; py++) {
                 Point p = new Point(px, py);
-                if (!p.equals(snek.getHead()) && !body.contains(p) && !obstacle.getObstacles().contains(p)) {
+                if (!p.equals(snake.getHead()) && !body.contains(p) && !obstacle.getObstacles().contains(p)) {
                     free.add(p);
                 }
             }

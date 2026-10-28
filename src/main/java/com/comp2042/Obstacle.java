@@ -2,7 +2,7 @@ package com.comp2042;
 
 import javafx.scene.paint.Color;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,22 +40,22 @@ public class Obstacle {
      * coin, cells that already hold an obstacle and the {@value #SAFE_DISTANCE} cells straight
      * ahead of the snake's head are never used, so the player always has time to react.
      *
-     * @param snek   the snake to keep clear of
+     * @param snake   the snake to keep clear of
      * @param coin   the coin to keep clear of
      * @param amount how many obstacles to add
      * @return how many were added, which is less than {@code amount} when free cells run out
      */
-    public int newObstacles(Snake snek, Coin coin, int amount) {
+    public int newObstacles(Snake snake, Coin coin, int amount) {
         if (obstacles.size() > 50) {
             return 0;
         }
-        List<Point> body = snek.getBody();
-        List<Point> ahead = cellsAhead(snek);
+        List<Point> body = snake.getBody();
+        List<Point> ahead = cellsAhead(snake);
         List<Point> free = new ArrayList<>();
         for (int px = 0; px < x; px++) {
             for (int py = 0; py < y; py++) {
                 Point p = new Point(px, py);
-                boolean taken = obstacles.contains(p) || p.equals(coin.getPos()) || p.equals(snek.getHead())
+                boolean taken = obstacles.contains(p) || p.equals(coin.getPos()) || p.equals(snake.getHead())
                         || body.contains(p) || ahead.contains(p);
                 if (!taken) {
                     free.add(p);
@@ -71,13 +71,13 @@ public class Obstacle {
     /**
      * Lists the cells straight ahead of the snake's head, wrapping around the board edges.
      *
-     * @param snek the snake
+     * @param snake the snake
      * @return the next {@value #SAFE_DISTANCE} cells in the snake's heading
      */
-    private List<Point> cellsAhead(Snake snek) {
+    private List<Point> cellsAhead(Snake snake) {
         List<Point> cells = new ArrayList<>();
-        Point p = snek.getHead();
-        Direction heading = snek.getHeading();
+        Point p = snake.getHead();
+        Direction heading = snake.getHeading();
         for (int i = 0; i < SAFE_DISTANCE; i++) {
             p = new Point(Math.floorMod(p.x + heading.getDx(), x), Math.floorMod(p.y + heading.getDy(), y));
             cells.add(p);
