@@ -65,4 +65,19 @@ class GameTest {
         game.incScore();
         assertTrue(game.gameWon());
     }
+
+    /** Regression test for B7: each obstacle takes one free cell, so one coin fewer is needed. */
+    @Test
+    void eachObstacleMeansOneCoinFewerToWin() {
+        Game game = new Game(3, 3, false, 'N');   // 7 free cells
+        game.decMaxScore(3);                      // 3 of them become obstacles
+
+        for (int i = 0; i < 3; i++) {
+            game.incScore();
+        }
+        assertFalse(game.gameWon());
+
+        game.incScore();
+        assertTrue(game.gameWon());
+    }
 }

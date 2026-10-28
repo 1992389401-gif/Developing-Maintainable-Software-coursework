@@ -21,6 +21,7 @@ public class GameController {
     private Stage stage;
     private String coinSoundPath = "resources/views/res/coinSound.wav";
     private Obstacle obstacle;
+    private final CoinFactory coinFactory = new CoinFactory();
 
     /** Where the snake moves on the next tick. Every game has its own, starting left. */
     private Direction direction = Direction.LEFT;
@@ -145,8 +146,8 @@ public class GameController {
             animation.setRate(game.getSpeed() + tempCoin.getSpeedBonus());
         } else if (coin.getClass().equals(SilverCoin.class)){
             Random rnd = new Random();
-            obstacle.newObstacles(snek, coin, rnd.nextInt(game.getWidth() * game.getHeight()/ 20) +3);
-            game.decMaxScore(obstacle.getObstacles().size());
+            int added = obstacle.newObstacles(snek, coin, rnd.nextInt(game.getWidth() * game.getHeight()/ 20) +3);
+            game.decMaxScore(added);
         } else if (coin.getClass().equals(BlueCoin.class)) {
             snek.ignoreBorders(true);
         }
@@ -154,22 +155,7 @@ public class GameController {
     }
 
     private void newCoin() {
-        if (game.isPowerUp()) {
-            Random rnd = new Random();
-            int ran = rnd.nextInt(12);
-            if (ran == 1) {
-                coin = new GoldCoin(game.getWidth(), game.getHeight(), snek, obstacle);
-            } else if (ran == 1) {
-                coin = new RainbowCoin(game.getWidth(), game.getHeight(), snek, obstacle);
-            } else if (ran == 3) {
-                coin = new BlueCoin(game.getWidth(), game.getHeight(), snek, obstacle);
-            } else if (ran == 4 && obstacle.getObstacles().size() == 0) {
-                coin = new SilverCoin(game.getWidth(), game.getHeight(), snek, obstacle);
-            } else {
-                coin = new Coin(game.getWidth(), game.getHeight(), snek, obstacle);
-            }
-        } else {
-            coin = new Coin(game.getWidth(), game.getHeight(), snek, obstacle);
-        }
+        CoinType type = coinFactory.nextType(game.isPowerUp(), !obstacle.getObstacles().isEmpty());
+        coin = coinFactory.create(type, game.getWidth(), game.getHeight(), snek, obstacle);
     }
 }
