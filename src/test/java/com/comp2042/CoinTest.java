@@ -3,8 +3,11 @@ package com.comp2042;
 import org.junit.jupiter.api.Test;
 
 import java.awt.Point;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 /**
  * Characterization tests that record where coins appear and what each kind of coin is worth
@@ -36,6 +39,17 @@ class CoinTest {
         Coin coin = new Coin(3, 3, snake, obstacle);
 
         assertEquals(new Point(2, 2), coin.getPos());
+    }
+
+    /** Regression test for B7: with no free cell left, the constructor used to loop forever. */
+    @Test
+    void refusesToSpawnOnAFullBoardInsteadOfHanging() {
+        Obstacle obstacle = new Obstacle(3, 1);
+        obstacle.getObstacles().add(new Point(0, 0));   // the one cell the snake leaves free
+        Snake snake = new Snake(3, 1, false, obstacle);
+
+        assertTimeoutPreemptively(Duration.ofSeconds(2),
+                () -> assertThrows(IllegalStateException.class, () -> new Coin(3, 1, snake, obstacle)));
     }
 
     @Test
