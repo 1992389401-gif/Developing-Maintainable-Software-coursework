@@ -3,6 +3,9 @@ package com.comp2042;
 import javafx.scene.paint.Color;
 
 public class Game {
+    /** A new snake covers two cells: its head and one body segment. */
+    private static final int START_LENGTH = 2;
+
     private Color color = Color.web("feffe4");
     private int width;
     private int height;
@@ -28,7 +31,7 @@ public class Game {
         this.powerUp = powerUp;
         width = x;
         height = y;
-        maxScore = x * y - 2;
+        maxScore = x * y - START_LENGTH;
         this.powerUp = powerUp;
         if (height > 50) {
             multiplier = 10;
@@ -62,9 +65,14 @@ public class Game {
         return height;
     }
 
+    /**
+     * Starts a new round: clears the score and restores the number of coins needed to win,
+     * since the obstacles of the last round are removed as well.
+     */
     public void resetScore() {
         score = 0;
         scorePoints = 0;
+        maxScore = width * height - START_LENGTH;
     }
 
     public Color getColor() {

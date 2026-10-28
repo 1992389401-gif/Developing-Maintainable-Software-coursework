@@ -66,6 +66,25 @@ class GameTest {
         assertTrue(game.gameWon());
     }
 
+    /**
+     * Regression test for B16: a TAB restart cleared the obstacles but kept the lower target
+     * they had caused, so the next round could be won with free cells left.
+     */
+    @Test
+    void restartingRestoresTheNumberOfCoinsNeededToWin() {
+        Game game = new Game(3, 3, false, 'N');   // 7 free cells
+        game.decMaxScore(3);                      // obstacles in the previous round
+
+        game.resetScore();                        // TAB: the obstacles are gone again
+
+        for (int i = 1; i <= 6; i++) {
+            game.incScore();
+            assertFalse(game.gameWon(), "won after only " + i + " coins");
+        }
+        game.incScore();
+        assertTrue(game.gameWon());
+    }
+
     /** Regression test for B7: each obstacle takes one free cell, so one coin fewer is needed. */
     @Test
     void eachObstacleMeansOneCoinFewerToWin() {
