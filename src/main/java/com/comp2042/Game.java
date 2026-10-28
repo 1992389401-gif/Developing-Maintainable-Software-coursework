@@ -45,8 +45,13 @@ public class Game {
         score++;
     }
 
+    /**
+     * Lowers the number of coins needed to win, because obstacles now cover some free cells.
+     *
+     * @param num how many new obstacles were placed
+     */
     public void decMaxScore(int num) {
-        this.maxScore -= (num - 1);
+        this.maxScore -= num;
     }
 
     public int getWidth() {
