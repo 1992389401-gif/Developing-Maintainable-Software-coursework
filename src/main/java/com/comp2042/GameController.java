@@ -136,6 +136,7 @@ public class GameController {
         keyPressed = false;
         game.resetScore();
         obstacle.reset();
+        gameView.clearTurns();
 
         gameView.gameWon();
         gameView.gameOver(snek);

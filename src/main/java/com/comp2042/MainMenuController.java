@@ -52,12 +52,4 @@ public class MainMenuController {
     public ViewManager getViewManager() {
         return viewManager;
     }
-
-    public static int getxValue() {
-        return X_VALUE;
-    }
-
-    public static int getyValue() {
-        return Y_VALUE;
-    }
 }

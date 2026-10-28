@@ -32,7 +32,7 @@ public class GameView {
     private double initY;
     private double fullScale = 1;
     private boolean fullsize = false;
-    private int[][] turnArray = new int[MainMenuController.getxValue()][MainMenuController.getyValue()];
+    private int[][] turnArray;
 
     private final ImageView headSprite = new ImageView(new Image("resources/views/res/snakehead.png"));
     private final ImageView bodySprite = new ImageView(new Image("resources/views/res/snakebody.png"));
@@ -42,6 +42,15 @@ public class GameView {
 
     public GameView(Game game) {
         this.game = game;
+        this.turnArray = new int[game.getWidth()][game.getHeight()];
+    }
+
+    /**
+     * Forgets the corners recorded in the previous round, so that a restarted game does not
+     * draw old corner sprites.
+     */
+    public void clearTurns() {
+        turnArray = new int[game.getWidth()][game.getHeight()];
     }
 
     /**
