@@ -12,11 +12,16 @@
     <name>Advanced Snake (JavaFX)</name>
 
     <properties>
-        <maven.compiler.release>21</maven.compiler.release>
+        <!-- JavaFX 25 requires JDK 23 or later, so compiling for 21 was misleading.
+             The project is built and tested with JDK 25 (LTS). -->
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>25.0.1</javafx.version>
-        <!-- Main class (package "resources" matches the original project layout) -->
+        <junit.version>5.14.4</junit.version>
+        <!-- JavaFX application class, started by: mvn javafx:run -->
         <mainClass>com.comp2042.Main</mainClass>
+        <!-- Plain entry point of the shaded jar; see the Launcher class for why it is needed -->
+        <launcherClass>com.comp2042.Launcher</launcherClass>
     </properties>
 
     <dependencies>
@@ -45,6 +50,14 @@
             <artifactId>javafx-base</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
+        <!-- Unit testing (JUnit 5 / Jupiter, including parameterized tests) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -57,6 +70,13 @@
                 <configuration>
                     <release>${maven.compiler.release}</release>
                 </configuration>
+            </plugin>
+
+            <!-- Runs the JUnit tests in src/test/java: mvn test -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
             </plugin>
 
             <!-- Lets you run the app with: mvn javafx:run -->
@@ -84,7 +104,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>${mainClass}</mainClass>
+                                    <mainClass>${launcherClass}</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
