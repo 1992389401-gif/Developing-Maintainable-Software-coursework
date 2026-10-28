@@ -46,34 +46,39 @@ public class GameController {
         animation.setRate(game.getSpeed());
     }
 
-    private final Timeline animation = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-        if (snek.getDead()) {
+    private final Timeline animation = new Timeline(new KeyFrame(Duration.seconds(1), event -> tick()));
+
+    /**
+     * Advances the game by one step: moves the snake, handles an eaten coin and redraws.
+     * The timeline calls it a few times per second, depending on the game speed.
+     */
+    private void tick() {
+        if (snek.getDead() || game.gameWon()) {
             return;
-        } else {
+        }
 
-            snek.move(direction);
+        snek.move(direction);
 
-            if (!snek.getDead() && snek.ateCoin(coin)) {
-                powerCoin();
-                game.incScore();
-                if (game.gameWon()) {
-                    gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
-                    return;
-                }
+        if (!snek.getDead() && snek.ateCoin(coin)) {
+            powerCoin();
+            game.incScore();
+            if (game.gameWon()) {
+                animation.stop();
+            } else {
                 newCoin();
             }
-
-            keyPressed = false;
-
-            if (!snek.getDead() || snek.hitSelf()) {
-                gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
-            }
-
-            gameView.gameWon();
-            gameView.gameOver(snek);
-            gameView.updateScoreLabel();
         }
-    }));
+
+        keyPressed = false;
+
+        if (!snek.getDead() || snek.hitSelf()) {
+            gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
+        }
+
+        gameView.gameWon();
+        gameView.gameOver(snek);
+        gameView.updateScoreLabel();
+    }
 
     public void handle(KeyEvent event) {
         if (event.getCode().isArrowKey()) animation.play();
@@ -109,6 +114,7 @@ public class GameController {
         }
 
         if (event.getCode().equals(KeyCode.ESCAPE)) {
+            animation.stop();
             MainMenuController mainMenuController = new MainMenuController();
             mainMenuController.getViewManager().getPrimaryStage().show();
             mainMenuController.getViewManager().getGameStage().close();
