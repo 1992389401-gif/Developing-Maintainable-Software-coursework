@@ -21,4 +21,15 @@ class DirectionTest {
         assertEquals(dx, direction.getDx());
         assertEquals(dy, direction.getDy());
     }
+
+    @ParameterizedTest(name = "opposite of {0} is {1}")
+    @CsvSource({
+            "UP, DOWN",
+            "DOWN, UP",
+            "LEFT, RIGHT",
+            "RIGHT, LEFT"
+    })
+    void eachDirectionHasAnOpposite(Direction direction, Direction expected) {
+        assertEquals(expected, direction.opposite());
+    }
 }

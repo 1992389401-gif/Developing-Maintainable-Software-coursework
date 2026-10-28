@@ -49,6 +49,18 @@ public class Snake {
         }
     }
 
+    /**
+     * Tells whether the snake may move in the given direction next. Turning straight back
+     * would drive the head into the body, so it is refused; turning sideways or keeping the
+     * same direction is allowed.
+     *
+     * @param direction the direction the player asked for
+     * @return {@code false} only for the direction opposite to the current heading
+     */
+    public boolean canTurn(Direction direction) {
+        return direction != heading.opposite();
+    }
+
     public int getBodyDir(int bodyCount) {
         if (bodyCount == 0) {
             return 0;

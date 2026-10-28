@@ -3,6 +3,7 @@ package com.comp2042;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.awt.Point;
 import java.util.List;
@@ -34,6 +35,37 @@ class SnakeTest {
     private static void steps(Snake snake, Direction direction, Coin coin, int count) {
         for (int i = 0; i < count; i++) {
             step(snake, direction, coin);
+        }
+    }
+
+    /** Returns a snake whose last move was in the given direction. */
+    private Snake snakeHeading(Direction heading) {
+        Snake snake = new Snake(SIZE, SIZE, false, obstacle);
+        if (heading == Direction.RIGHT) {
+            step(snake, Direction.UP, farCoin);   // a new snake heads left, so go up before turning right
+        }
+        step(snake, heading, farCoin);
+        return snake;
+    }
+
+    /** Regression test for B1: pressing DOWN while moving UP used to reverse the snake. */
+    @ParameterizedTest(name = "heading {0} -> turning straight back is refused")
+    @EnumSource(Direction.class)
+    void cannotTurnStraightBack(Direction heading) {
+        Snake snake = snakeHeading(heading);
+
+        assertFalse(snake.canTurn(heading.opposite()));
+    }
+
+    @ParameterizedTest(name = "heading {0} -> turning sideways or going on is allowed")
+    @EnumSource(Direction.class)
+    void canTurnSidewaysOrKeepGoing(Direction heading) {
+        Snake snake = snakeHeading(heading);
+
+        for (Direction direction : Direction.values()) {
+            if (direction != heading.opposite()) {
+                assertTrue(snake.canTurn(direction), "turn to " + direction);
+            }
         }
     }
 

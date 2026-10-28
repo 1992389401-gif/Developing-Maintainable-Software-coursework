@@ -77,7 +77,8 @@ public class GameController {
     public void handle(KeyEvent event) {
         if (event.getCode().isArrowKey()) animation.play();
 
-        if (valKey(event.getCode()) && !keyPressed) {
+        Direction requested = KeyBindings.directionFor(event.getCode());
+        if (requested != null && snek.canTurn(requested) && !keyPressed) {
             lastKey = key;
             key = event.getCode();
             keyPressed = true;
@@ -111,17 +112,6 @@ public class GameController {
             MainMenuController mainMenuController = new MainMenuController();
             mainMenuController.getViewManager().getPrimaryStage().show();
             mainMenuController.getViewManager().getGameStage().close();
-        }
-    }
-
-    private boolean valKey(KeyCode key) {
-        if (!key.isArrowKey()) return false;
-        else {
-            if (key.equals(KeyCode.LEFT)) if (!this.key.equals(KeyCode.RIGHT)) return true;
-            if (key.equals(KeyCode.RIGHT)) if (!this.key.equals(KeyCode.LEFT)) return true;
-            if (key.equals(KeyCode.DOWN)) if (!this.key.equals(KeyCode.DOWN)) return true;
-            if (key.equals(KeyCode.UP)) return !this.key.equals(KeyCode.DOWN);
-            return false;
         }
     }
 

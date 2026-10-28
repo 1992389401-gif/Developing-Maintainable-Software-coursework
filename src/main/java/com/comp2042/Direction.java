@@ -35,4 +35,18 @@ public enum Direction {
     public int getDy() {
         return dy;
     }
+
+    /**
+     * Returns the direction pointing the other way.
+     *
+     * @return DOWN for UP, LEFT for RIGHT, and so on
+     */
+    public Direction opposite() {
+        return switch (this) {
+            case UP -> DOWN;
+            case DOWN -> UP;
+            case LEFT -> RIGHT;
+            case RIGHT -> LEFT;
+        };
+    }
 }
