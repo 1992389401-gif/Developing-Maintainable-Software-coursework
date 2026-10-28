@@ -34,10 +34,10 @@ class GameTest {
             "51, 10.0",
             "60, 10.0"
     })
-    void cellSizeHalvesForBoardsTallerThanFifty(int height, double expectedMultiplier) {
+    void cellSizeHalvesForBoardsTallerThanFifty(int height, double expectedCellSize) {
         Game game = new Game(20, height, true, 'N');
 
-        assertEquals(expectedMultiplier, game.getMultiplier());
+        assertEquals(expectedCellSize, game.getCellSize());
     }
 
     @Test

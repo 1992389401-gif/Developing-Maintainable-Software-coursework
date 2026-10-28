@@ -68,13 +68,13 @@ public class GameView {
         return sprites;
     }
 
-    public void makeScene(Scene scene, Snake snek, Coin coin, Obstacle obstacle) {
+    public void makeScene(Scene scene, Snake snake, Coin coin, Obstacle obstacle) {
         Scene gameScene = scene;
         gridCanvas = new Canvas(gameScene.getWidth(), gameScene.getHeight());
         initX = scene.getWidth();
         initY = scene.getHeight();
         gc = gridCanvas.getGraphicsContext2D();
-        drawGrid(coin, snek, obstacle);
+        drawGrid(coin, snake, obstacle);
 
         gameOverLabel = new Label("GAME OVER");
         gameOverLabel.setId("gameOverLabel");
@@ -94,7 +94,7 @@ public class GameView {
         scoreLabel.setVisible(true);
     }
 
-    public void scaleToFullscreen(boolean fullScreen, Stage primaryStage, Obstacle obstacle, Snake snek, Coin coin) {
+    public void scaleToFullscreen(boolean fullScreen, Stage primaryStage, Obstacle obstacle, Snake snake, Coin coin) {
         primaryStage.setFullScreen(fullScreen);
 
         double xScaling = Screen.getPrimary().getVisualBounds().getHeight() / initY;
@@ -118,26 +118,26 @@ public class GameView {
 
         gameOverLabel.setFont(new Font("Arial", 25 * fullScale));
         gameWonLabel.setFont(new Font("Arial", 25 * fullScale));
-        drawGrid(coin, snek, obstacle);
+        drawGrid(coin, snake, obstacle);
     }
 
-    public void drawGrid(Coin coin, Snake snek, Obstacle obstacle) {
+    public void drawGrid(Coin coin, Snake snake, Obstacle obstacle) {
         gc.setFill(game.getColor());
         gc.fillRect(0, 0, gridCanvas.getWidth(), gridCanvas.getHeight());
 
-        gc.drawImage(coinSprites.get(coin.getType()), (coin.getPos().x * game.getMultiplier()) * fullScale, (coin.getPos().y * game.getMultiplier()) * fullScale, game.getMultiplier() * fullScale - 3 * fullScale, game.getMultiplier() * fullScale - 3 * fullScale);
+        gc.drawImage(coinSprites.get(coin.getType()), (coin.getPos().x * game.getCellSize()) * fullScale, (coin.getPos().y * game.getCellSize()) * fullScale, game.getCellSize() * fullScale - 3 * fullScale, game.getCellSize() * fullScale - 3 * fullScale);
 
         int bodyIndex = 0;
-        for (Point point : snek.getBody()) {
-            drawBody(snek, point, bodyIndex);
+        for (Point point : snake.getBody()) {
+            drawBody(snake, point, bodyIndex);
             bodyIndex++;
         }
 
-        drawHead(snek);
+        drawHead(snake);
 
         gc.setFill(obstacle.getColor());
         for (Point point : obstacle.getObstacles()) {
-            gc.fillRect(point.x * game.getMultiplier() * fullScale, point.y * game.getMultiplier() * fullScale, game.getMultiplier() * fullScale, game.getMultiplier() * fullScale);
+            gc.fillRect(point.x * game.getCellSize() * fullScale, point.y * game.getCellSize() * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
         }
     }
 
@@ -157,28 +157,28 @@ public class GameView {
         };
     }
 
-    private void drawHead(Snake snek) {
-        headSprite.setRotate(rotationOf(snek.getHeading()));
+    private void drawHead(Snake snake) {
+        headSprite.setRotate(rotationOf(snake.getHeading()));
         SnapshotParameters params = new SnapshotParameters();
         params.setFill(Color.TRANSPARENT);
         Image rotatedImage = headSprite.snapshot(params, null);
-        gc.drawImage(rotatedImage, (snek.getHead().x * game.getMultiplier()) * fullScale, (snek.getHead().y * game.getMultiplier()) * fullScale, game.getMultiplier() * fullScale, game.getMultiplier() * fullScale);
+        gc.drawImage(rotatedImage, (snake.getHead().x * game.getCellSize()) * fullScale, (snake.getHead().y * game.getCellSize()) * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
     }
 
-    private void drawBody(Snake snek, Point point, int index) {
+    private void drawBody(Snake snake, Point point, int index) {
         Image rotatedImage;
-        if (snek.getBody().size() <= 1) {
-            tailSprite.setRotate(rotationOf(snek.getHeading()));
+        if (snake.getBody().size() <= 1) {
+            tailSprite.setRotate(rotationOf(snake.getHeading()));
             SnapshotParameters params = new SnapshotParameters();
             params.setFill(Color.TRANSPARENT);
             rotatedImage = tailSprite.snapshot(params, null);
         } else if (index == 0) {
             int rotateTail;
-            if (snek.getBody().get(1).getX() == snek.getBody().get(0).getX() && snek.getBody().get(1).getY() == snek.getBody().get(0).getY() - 1) {
+            if (snake.getBody().get(1).getX() == snake.getBody().get(0).getX() && snake.getBody().get(1).getY() == snake.getBody().get(0).getY() - 1) {
                 rotateTail = 0;
-            } else if (snek.getBody().get(1).getX() == snek.getBody().get(0).getX() && snek.getBody().get(1).getY() == snek.getBody().get(0).getY() + 1) {
+            } else if (snake.getBody().get(1).getX() == snake.getBody().get(0).getX() && snake.getBody().get(1).getY() == snake.getBody().get(0).getY() + 1) {
                 rotateTail = 180;
-            } else if (snek.getBody().get(1).getX() == snek.getBody().get(0).getX() - 1 && snek.getBody().get(1).getY() == snek.getBody().get(0).getY()) {
+            } else if (snake.getBody().get(1).getX() == snake.getBody().get(0).getX() - 1 && snake.getBody().get(1).getY() == snake.getBody().get(0).getY()) {
                 rotateTail = 270;
             } else {
                 rotateTail = 90;
@@ -187,49 +187,49 @@ public class GameView {
             SnapshotParameters params = new SnapshotParameters();
             params.setFill(Color.TRANSPARENT);
             rotatedImage = tailSprite.snapshot(params, null);
-        } else if (index > 0 && (turnArray[(int) snek.getBody().get(index).getX()][(int) snek.getBody().get(index).getY()] != 0)) {
-            turnSprite.setRotate(90 * turnArray[(int) snek.getBody().get(index).getX()][(int) snek.getBody().get(index).getY()]);
+        } else if (index > 0 && (turnArray[(int) snake.getBody().get(index).getX()][(int) snake.getBody().get(index).getY()] != 0)) {
+            turnSprite.setRotate(90 * turnArray[(int) snake.getBody().get(index).getX()][(int) snake.getBody().get(index).getY()]);
             SnapshotParameters params = new SnapshotParameters();
             params.setFill(Color.TRANSPARENT);
             rotatedImage = turnSprite.snapshot(params, null);
         } else {
-            bodySprite.setRotate(snek.getBodyDir(index));
+            bodySprite.setRotate(snake.getBodyDir(index));
             SnapshotParameters params = new SnapshotParameters();
             params.setFill(Color.TRANSPARENT);
             rotatedImage = bodySprite.snapshot(params, null);
         }
 
-        if (turnArray[(int) snek.getBody().get(0).getX()][(int) snek.getBody().get(0).getY()] != 0) {
-            turnArray[(int) snek.getBody().get(0).getX()][(int) snek.getBody().get(0).getY()] = 0;
+        if (turnArray[(int) snake.getBody().get(0).getX()][(int) snake.getBody().get(0).getY()] != 0) {
+            turnArray[(int) snake.getBody().get(0).getX()][(int) snake.getBody().get(0).getY()] = 0;
         }
 
-        gc.drawImage(rotatedImage, (point.x * game.getMultiplier()) * fullScale, (point.y * game.getMultiplier()) * fullScale, game.getMultiplier() * fullScale, game.getMultiplier() * fullScale);
+        gc.drawImage(rotatedImage, (point.x * game.getCellSize()) * fullScale, (point.y * game.getCellSize()) * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
     }
 
     /**
      * Records which corner sprite to draw on the head's cell when the snake turns there.
      *
-     * @param snek the snake that is turning
+     * @param snake the snake that is turning
      * @param from the direction of the snake's last move
      * @param to   the direction of its next move
      */
-    public void turnDir(Snake snek, Direction from, Direction to) {
+    public void turnDir(Snake snake, Direction from, Direction to) {
         if ((from == Direction.LEFT && to == Direction.UP) || (from == Direction.DOWN && to == Direction.RIGHT)) {
-            turnArray[(int) snek.getHead().getX()][(int) snek.getHead().getY()] = 2;
+            turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 2;
         } else if ((from == Direction.LEFT && to == Direction.DOWN) || (from == Direction.UP && to == Direction.RIGHT)) {
-            turnArray[(int) snek.getHead().getX()][(int) snek.getHead().getY()] = 3;
+            turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 3;
         } else if ((from == Direction.RIGHT && to == Direction.UP) || (from == Direction.DOWN && to == Direction.LEFT)) {
-            turnArray[(int) snek.getHead().getX()][(int) snek.getHead().getY()] = 1;
+            turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 1;
         } else if ((from == Direction.UP && to == Direction.LEFT) || (from == Direction.RIGHT && to == Direction.DOWN)) {
-            turnArray[(int) snek.getHead().getX()][(int) snek.getHead().getY()] = 4;
-        } else turnArray[(int) snek.getHead().getX()][(int) snek.getHead().getY()] = 0;
+            turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 4;
+        } else turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 0;
     }
 
-    public void gameOver(Snake snek) {
-        if (snek.getDead() && !gameOverVis) {
+    public void gameOver(Snake snake) {
+        if (snake.isDead() && !gameOverVis) {
             gameOverVis = true;
             gameOverLabel.setVisible(true);
-        } else if (!snek.getDead() && gameOverVis) {
+        } else if (!snake.isDead() && gameOverVis) {
             gameOverLabel.setVisible(false);
             gameOverVis = false;
         }

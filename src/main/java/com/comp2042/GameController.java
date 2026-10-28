@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.Random;
 
 public class GameController {
-    private Snake snek;
+    private Snake snake;
     private Coin coin;
     private GameView gameView;
     private Game game;
@@ -26,8 +26,8 @@ public class GameController {
     private Direction direction = Direction.LEFT;
     private boolean keyPressed = false;
 
-    public GameController(Snake snek, Coin coin, Game game, GameView gameView, Obstacle obstacle, Stage stage) {
-        this.snek = snek;
+    public GameController(Snake snake, Coin coin, Game game, GameView gameView, Obstacle obstacle, Stage stage) {
+        this.snake = snake;
         this.coin = coin;
         this.gameView = gameView;
         this.game = game;
@@ -61,13 +61,13 @@ public class GameController {
      * The timeline calls it a few times per second, depending on the game speed.
      */
     private void tick() {
-        if (snek.getDead() || game.gameWon()) {
+        if (snake.isDead() || game.gameWon()) {
             return;
         }
 
-        snek.move(direction);
+        snake.move(direction);
 
-        if (!snek.getDead() && snek.ateCoin(coin)) {
+        if (!snake.isDead() && snake.ateCoin(coin)) {
             if (coinSound != null) {
                 coinSound.play();
             }
@@ -82,12 +82,12 @@ public class GameController {
 
         keyPressed = false;
 
-        if (!snek.getDead() || snek.hitSelf()) {
-            gameView.drawGrid(coin, snek, obstacle);
+        if (!snake.isDead() || snake.hitSelf()) {
+            gameView.drawGrid(coin, snake, obstacle);
         }
 
         gameView.gameWon();
-        gameView.gameOver(snek);
+        gameView.gameOver(snake);
         gameView.updateScoreLabel();
     }
 
@@ -95,8 +95,8 @@ public class GameController {
         if (event.getCode().isArrowKey()) animation.play();
 
         Direction requested = KeyBindings.directionFor(event.getCode());
-        if (requested != null && snek.canTurn(requested) && !keyPressed) {
-            gameView.turnDir(snek, snek.getHeading(), requested);
+        if (requested != null && snake.canTurn(requested) && !keyPressed) {
+            gameView.turnDir(snake, snake.getHeading(), requested);
             direction = requested;
             keyPressed = true;
         }
@@ -111,14 +111,14 @@ public class GameController {
         }
 
         if (KeyBindings.entersFullScreen(event.getCode())) {
-            gameView.scaleToFullscreen(true, stage, obstacle, snek, coin);
+            gameView.scaleToFullscreen(true, stage, obstacle, snake, coin);
             gameView.gameOverLabel.setStyle("-fx-font-size: 50;");
             gameView.gameWonLabel.setStyle("-fx-font-size: 50;");
             gameView.scoreLabel.setStyle("-fx-font-size: 35;");
         }
 
         if (KeyBindings.leavesFullScreen(event.getCode())) {
-            gameView.scaleToFullscreen(false, stage, obstacle, snek, coin);
+            gameView.scaleToFullscreen(false, stage, obstacle, snake, coin);
             gameView.gameOverLabel.setStyle("-fx-font-size: 15;");
             gameView.gameWonLabel.setStyle("-fx-font-size: 15;");
             gameView.scoreLabel.setStyle("-fx-font-size: 15;");
@@ -137,8 +137,8 @@ public class GameController {
         animation.jumpTo(Duration.ZERO);
         animation.stop();
 
-        snek = new Snake(game.getWidth(), game.getHeight(), game.isNoBorder(), obstacle);
-        coin = new Coin(game.getWidth(), game.getHeight(), snek, obstacle);
+        snake = new Snake(game.getWidth(), game.getHeight(), game.isNoBorder(), obstacle);
+        coin = new Coin(game.getWidth(), game.getHeight(), snake, obstacle);
 
         animation.setRate(game.getSpeed());
         direction = Direction.LEFT;
@@ -148,30 +148,30 @@ public class GameController {
         gameView.clearTurns();
 
         gameView.gameWon();
-        gameView.gameOver(snek);
+        gameView.gameOver(snake);
         gameView.updateScoreLabel();
 
-        gameView.drawGrid(coin, snek, obstacle);
+        gameView.drawGrid(coin, snake, obstacle);
     }
 
     private void powerCoin() {
         animation.setRate(game.getSpeed());
-        snek.ignoreBorders(false);
+        snake.ignoreBorders(false);
         if (coin.getClass().equals(RainbowCoin.class)) {
             RainbowCoin tempCoin = (RainbowCoin) coin;
             animation.setRate(game.getSpeed() + tempCoin.getSpeedBonus());
         } else if (coin.getClass().equals(SilverCoin.class)){
             Random rnd = new Random();
-            int added = obstacle.newObstacles(snek, coin, rnd.nextInt(game.getWidth() * game.getHeight()/ 20) +3);
+            int added = obstacle.newObstacles(snake, coin, rnd.nextInt(game.getWidth() * game.getHeight()/ 20) +3);
             game.decMaxScore(added);
         } else if (coin.getClass().equals(BlueCoin.class)) {
-            snek.ignoreBorders(true);
+            snake.ignoreBorders(true);
         }
         game.addPoints(coin.getPoints());
     }
 
     private void newCoin() {
         CoinType type = coinFactory.nextType(game.isPowerUp(), !obstacle.getObstacles().isEmpty());
-        coin = coinFactory.create(type, game.getWidth(), game.getHeight(), snek, obstacle);
+        coin = coinFactory.create(type, game.getWidth(), game.getHeight(), snake, obstacle);
     }
 }

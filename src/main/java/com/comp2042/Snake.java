@@ -7,8 +7,8 @@ public class Snake {
     private boolean dead = false;
     private final Point head = new Point();
     private final ArrayList<Point> body = new ArrayList<>();
-    private final int gx;
-    private final int gy;
+    private final int width;
+    private final int height;
     private boolean ignoreBorders = false;
     private boolean noBorder;
     private Obstacle obstacle;
@@ -19,8 +19,8 @@ public class Snake {
         this.noBorder = noBorder;
         this.head.setLocation(x / 2, y / 2);
         this.body.add(new Point(x / 2 + 1, y / 2));
-        this.gx = x;
-        this.gy = y;
+        this.width = x;
+        this.height = y;
     }
 
     /**
@@ -36,7 +36,7 @@ public class Snake {
         head.translate(direction.getDx(), direction.getDy());
         if (borderControl()) {
             if (ignoreBorders || noBorder) {
-                head.setLocation(Math.floorMod(head.x, gx), Math.floorMod(head.y, gy));
+                head.setLocation(Math.floorMod(head.x, width), Math.floorMod(head.y, height));
             } else {
                 head.setLocation(previous);
                 dead = true;
@@ -83,7 +83,7 @@ public class Snake {
     }
 
     private boolean borderControl() {
-        return head.getX() < 0 || head.getY() < 0 || head.getX() >= gx || head.getY() >= gy;
+        return head.getX() < 0 || head.getY() < 0 || head.getX() >= width || head.getY() >= height;
     }
 
     public boolean hitSelf() {
@@ -98,7 +98,7 @@ public class Snake {
         return new Point(head);
     }
 
-    public boolean getDead() {
+    public boolean isDead() {
         return dead;
     }
 
