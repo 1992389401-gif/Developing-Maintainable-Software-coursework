@@ -46,34 +46,39 @@ public class GameController {
         animation.setRate(game.getSpeed());
     }
 
-    private final Timeline animation = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+    private final Timeline animation = new Timeline(new KeyFrame(Duration.seconds(1), event -> tick()));
+
+    /**
+     * Advances the game by one step: moves the snake, handles an eaten coin and redraws.
+     * The timeline calls it a few times per second, depending on the game speed.
+     */
+    private void tick() {
         if (snek.getDead()) {
             return;
-        } else {
-
-            snek.move(direction);
-
-            if (!snek.getDead() && snek.ateCoin(coin)) {
-                powerCoin();
-                game.incScore();
-                if (game.gameWon()) {
-                    gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
-                    return;
-                }
-                newCoin();
-            }
-
-            keyPressed = false;
-
-            if (!snek.getDead() || snek.hitSelf()) {
-                gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
-            }
-
-            gameView.gameWon();
-            gameView.gameOver(snek);
-            gameView.updateScoreLabel();
         }
-    }));
+
+        snek.move(direction);
+
+        if (!snek.getDead() && snek.ateCoin(coin)) {
+            powerCoin();
+            game.incScore();
+            if (game.gameWon()) {
+                gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
+                return;
+            }
+            newCoin();
+        }
+
+        keyPressed = false;
+
+        if (!snek.getDead() || snek.hitSelf()) {
+            gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
+        }
+
+        gameView.gameWon();
+        gameView.gameOver(snek);
+        gameView.updateScoreLabel();
+    }
 
     public void handle(KeyEvent event) {
         if (event.getCode().isArrowKey()) animation.play();
