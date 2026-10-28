@@ -1,13 +1,10 @@
 package com.comp2042;
 
-import javafx.scene.image.Image;
-
 import java.awt.*;
 import java.util.Random;
 
 public class Coin {
     private Point pos;
-    private Image image = new Image("resources/views/res/redcoin.png");
 
     public Coin(int x, int y, Snake snek, Obstacle obstacle) {
         int tx;
@@ -21,6 +18,16 @@ public class Coin {
         } while (snek.getHead().equals(pos) || snek.getBody().contains(pos) || obstacle.getObstacles().contains(pos));
     }
 
+    /**
+     * Creates a coin on a given cell. Unit tests use it to put a coin exactly where the
+     * snake will move next.
+     *
+     * @param pos the cell the coin occupies
+     */
+    Coin(Point pos) {
+        this.pos = new Point(pos);
+    }
+
     public Point getPos() {
         return new Point(pos);
     }
@@ -30,7 +37,12 @@ public class Coin {
         return points;
     }
 
-    public Image getImage() {
-        return image;
+    /**
+     * Returns the kind of this coin. The view uses it to choose the sprite to draw.
+     *
+     * @return {@link CoinType#RED} for a plain coin
+     */
+    public CoinType getType() {
+        return CoinType.RED;
     }
 }
