@@ -12,10 +12,12 @@
     <name>Advanced Snake (JavaFX)</name>
 
     <properties>
-        <maven.compiler.release>21</maven.compiler.release>
+        <!-- JavaFX 25 requires JDK 23 or later, so compiling for 21 was misleading.
+             The project is built and tested with JDK 25 (LTS). -->
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>25.0.1</javafx.version>
-        <!-- Main class (package "resources" matches the original project layout) -->
+        <!-- JavaFX application class, started by: mvn javafx:run -->
         <mainClass>com.comp2042.Main</mainClass>
     </properties>
 
