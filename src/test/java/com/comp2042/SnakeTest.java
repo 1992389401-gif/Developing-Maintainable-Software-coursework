@@ -3,6 +3,7 @@ package com.comp2042;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.awt.Point;
 import java.util.List;
@@ -24,16 +25,64 @@ class SnakeTest {
     private final Coin farCoin = new Coin(new Point(0, 0));
 
     /** Moves one cell the way the game loop does: the tail is dropped unless a coin was eaten. */
-    private static void step(Snake snake, char direction, Coin coin) {
+    private static void step(Snake snake, Direction direction, Coin coin) {
         snake.move(direction);
         if (!snake.getDead()) {
             snake.ateCoin(coin);
         }
     }
 
-    private static void steps(Snake snake, char direction, Coin coin, int count) {
+    private static void steps(Snake snake, Direction direction, Coin coin, int count) {
         for (int i = 0; i < count; i++) {
             step(snake, direction, coin);
+        }
+    }
+
+    /** Returns a snake whose last move was in the given direction. */
+    private Snake snakeHeading(Direction heading) {
+        Snake snake = new Snake(SIZE, SIZE, false, obstacle);
+        if (heading == Direction.RIGHT) {
+            step(snake, Direction.UP, farCoin);   // a new snake heads left, so go up before turning right
+        }
+        step(snake, heading, farCoin);
+        return snake;
+    }
+
+    /** Regression test for B1: pressing DOWN while moving UP used to reverse the snake. */
+    @ParameterizedTest(name = "heading {0} -> turning straight back is refused")
+    @EnumSource(Direction.class)
+    void cannotTurnStraightBack(Direction heading) {
+        Snake snake = snakeHeading(heading);
+
+        assertFalse(snake.canTurn(heading.opposite()));
+    }
+
+    /**
+     * Regression test for B3: the heading used to live in static fields of GameController,
+     * so a new game inherited the direction of the previous one.
+     */
+    @Test
+    void everyNewSnakeStartsHeadingLeftWhateverEarlierSnakesDid() {
+        Snake earlier = new Snake(SIZE, SIZE, false, obstacle);
+        step(earlier, Direction.UP, farCoin);
+        step(earlier, Direction.RIGHT, farCoin);
+
+        Snake next = new Snake(SIZE, SIZE, false, obstacle);
+
+        assertEquals(Direction.LEFT, next.getHeading());
+        assertTrue(next.canTurn(Direction.LEFT));
+        assertFalse(next.canTurn(Direction.RIGHT));
+    }
+
+    @ParameterizedTest(name = "heading {0} -> turning sideways or going on is allowed")
+    @EnumSource(Direction.class)
+    void canTurnSidewaysOrKeepGoing(Direction heading) {
+        Snake snake = snakeHeading(heading);
+
+        for (Direction direction : Direction.values()) {
+            if (direction != heading.opposite()) {
+                assertTrue(snake.canTurn(direction), "turn to " + direction);
+            }
         }
     }
 
@@ -43,24 +92,24 @@ class SnakeTest {
 
         assertEquals(new Point(10, 10), snake.getHead());
         assertEquals(List.of(new Point(11, 10)), snake.getBody());
-        assertEquals(270, snake.getSnakeDir());
+        assertEquals(Direction.LEFT, snake.getHeading());
         assertFalse(snake.getDead());
     }
 
-    @ParameterizedTest(name = "move {0} -> head at ({1},{2}), facing {3} degrees")
+    @ParameterizedTest(name = "move {0} -> head at ({1},{2})")
     @CsvSource({
-            "U, 10, 9, 0",
-            "D, 10, 11, 180",
-            "L, 9, 10, 270"
+            "UP, 10, 9",
+            "DOWN, 10, 11",
+            "LEFT, 9, 10"
     })
-    void movesOneCellAndKeepsItsLength(char direction, int x, int y, int angle) {
+    void movesOneCellAndKeepsItsLength(Direction direction, int x, int y) {
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
 
         step(snake, direction, farCoin);
 
         assertEquals(new Point(x, y), snake.getHead());
         assertEquals(List.of(new Point(10, 10)), snake.getBody());
-        assertEquals(angle, snake.getSnakeDir());
+        assertEquals(direction, snake.getHeading());
     }
 
     @Test
@@ -68,7 +117,7 @@ class SnakeTest {
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
         Coin coin = new Coin(new Point(9, 10));
 
-        snake.move('L');
+        snake.move(Direction.LEFT);
 
         assertTrue(snake.ateCoin(coin));
         assertEquals(List.of(new Point(11, 10), new Point(10, 10)), snake.getBody());
@@ -78,22 +127,22 @@ class SnakeTest {
     void solidWallKillsTheSnakeAndLeavesItsHeadOnTheBoard() {
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
 
-        steps(snake, 'L', farCoin, 10);
+        steps(snake, Direction.LEFT, farCoin, 10);
         assertFalse(snake.getDead());
         assertEquals(new Point(0, 10), snake.getHead());
 
-        step(snake, 'L', farCoin);
+        step(snake, Direction.LEFT, farCoin);
         assertTrue(snake.getDead());
         assertEquals(new Point(0, 10), snake.getHead());
     }
 
     @ParameterizedTest(name = "{1} moves {0} on an open board -> head at ({2},{3})")
     @CsvSource({
-            "L, 11, 19, 10",
-            "U, 11, 10, 19",
-            "D, 10, 10, 0"
+            "LEFT, 11, 19, 10",
+            "UP, 11, 10, 19",
+            "DOWN, 10, 10, 0"
     })
-    void wrapsAroundWhenTheBoardHasNoBorder(char direction, int count, int x, int y) {
+    void wrapsAroundWhenTheBoardHasNoBorder(Direction direction, int count, int x, int y) {
         Snake snake = new Snake(SIZE, SIZE, true, obstacle);
 
         steps(snake, direction, farCoin, count);
@@ -107,10 +156,27 @@ class SnakeTest {
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
         snake.ignoreBorders(true);
 
-        steps(snake, 'L', farCoin, 11);
+        steps(snake, Direction.LEFT, farCoin, 11);
 
         assertFalse(snake.getDead());
         assertEquals(new Point(19, 10), snake.getHead());
+    }
+
+    /**
+     * Regression test for B15: after wrapping to the opposite edge, the cell the head landed
+     * on was never checked for an obstacle, so the snake passed through it.
+     */
+    @Test
+    void wrappingOntoAnObstacleKillsTheSnake() {
+        obstacle.getObstacles().add(new Point(19, 10));
+        Snake snake = new Snake(SIZE, SIZE, true, obstacle);
+        steps(snake, Direction.LEFT, farCoin, 10);   // head at the left edge, (0,10)
+        assertFalse(snake.getDead());
+
+        step(snake, Direction.LEFT, farCoin);        // wraps to (19,10), the obstacle
+
+        assertTrue(snake.getDead());
+        assertEquals(new Point(0, 10), snake.getHead());
     }
 
     @Test
@@ -118,7 +184,7 @@ class SnakeTest {
         obstacle.getObstacles().add(new Point(9, 10));
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
 
-        step(snake, 'L', farCoin);
+        step(snake, Direction.LEFT, farCoin);
 
         assertTrue(snake.getDead());
         assertEquals(new Point(10, 10), snake.getHead());
@@ -127,26 +193,40 @@ class SnakeTest {
     @Test
     void bitingItsOwnBodyKillsALongSnake() {
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
-        step(snake, 'L', new Coin(new Point(9, 10)));
-        step(snake, 'L', new Coin(new Point(8, 10)));
-        step(snake, 'L', new Coin(new Point(7, 10)));   // length 5, head at (7,10)
+        step(snake, Direction.LEFT, new Coin(new Point(9, 10)));
+        step(snake, Direction.LEFT, new Coin(new Point(8, 10)));
+        step(snake, Direction.LEFT, new Coin(new Point(7, 10)));   // length 5, head at (7,10)
 
-        step(snake, 'U', farCoin);
-        step(snake, 'R', farCoin);
+        step(snake, Direction.UP, farCoin);
+        step(snake, Direction.RIGHT, farCoin);
         assertFalse(snake.getDead());
 
-        step(snake, 'D', farCoin);                      // back down into (8,10)
+        step(snake, Direction.DOWN, farCoin);                      // back down into (8,10)
+        assertTrue(snake.getDead());
+    }
+
+    /**
+     * Regression test for B10: self-collision was only checked for snakes longer than four
+     * cells, so together with B1/B3 a short snake could reverse straight through itself.
+     */
+    @Test
+    void aShortSnakeDiesWhenDrivenBackIntoItsBody() {
+        Snake snake = new Snake(SIZE, SIZE, false, obstacle);
+        step(snake, Direction.LEFT, new Coin(new Point(9, 10)));   // length 3, head at (9,10)
+
+        step(snake, Direction.RIGHT, farCoin);                     // into (10,10), which is not the tail
+
         assertTrue(snake.getDead());
     }
 
     @Test
     void mayMoveIntoTheCellItsTailIsLeaving() {
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
-        step(snake, 'L', new Coin(new Point(9, 10)));
-        step(snake, 'U', new Coin(new Point(9, 9)));    // length 4, curled into a 2x2 square
-        step(snake, 'R', farCoin);
+        step(snake, Direction.LEFT, new Coin(new Point(9, 10)));
+        step(snake, Direction.UP, new Coin(new Point(9, 9)));    // length 4, curled into a 2x2 square
+        step(snake, Direction.RIGHT, farCoin);
 
-        step(snake, 'D', farCoin);                      // the head takes the tail's old cell
+        step(snake, Direction.DOWN, farCoin);                      // the head takes the tail's old cell
 
         assertFalse(snake.getDead());
         assertEquals(new Point(10, 10), snake.getHead());
