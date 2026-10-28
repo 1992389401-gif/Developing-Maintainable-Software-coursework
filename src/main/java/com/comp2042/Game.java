@@ -17,17 +17,17 @@ public class Game {
     private boolean powerUp;
     private boolean noBorder;
 
-    public Game(int x, int y, boolean powerUp, char difficulty) {
-        if (difficulty == 'E') {
-            speed = 8.5;
-            noBorder = true;
-        } else if (difficulty == 'N') {
-            speed = 8.5;
-            noBorder = false;
-        } else if (difficulty == 'H') {
-            speed = 13;
-            noBorder = false;
-        }
+    /**
+     * Creates the settings and score keeping for one game.
+     *
+     * @param x          the board width in cells
+     * @param y          the board height in cells
+     * @param powerUp    whether special coins can appear
+     * @param difficulty the speed and border rule of the game
+     */
+    public Game(int x, int y, boolean powerUp, Difficulty difficulty) {
+        speed = difficulty.getSpeed();
+        noBorder = difficulty.isWrapAround();
         this.powerUp = powerUp;
         width = x;
         height = y;

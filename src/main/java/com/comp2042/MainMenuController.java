@@ -11,7 +11,7 @@ public class MainMenuController {
     private static final int X_VALUE = 20;
     private static final int Y_VALUE = 20;
     private static final boolean POWER_UP = true;
-    private static final char DIFFICULTY = 'N';
+    private static final Difficulty DIFFICULTY = Difficulty.NORMAL;
 
     private Scene gameScene;
 
