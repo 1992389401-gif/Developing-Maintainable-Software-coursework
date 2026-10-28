@@ -20,6 +20,8 @@
         <junit.version>5.14.4</junit.version>
         <!-- JavaFX application class, started by: mvn javafx:run -->
         <mainClass>com.comp2042.Main</mainClass>
+        <!-- Plain entry point of the shaded jar; see the Launcher class for why it is needed -->
+        <launcherClass>com.comp2042.Launcher</launcherClass>
     </properties>
 
     <dependencies>
@@ -102,7 +104,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>${mainClass}</mainClass>
+                                    <mainClass>${launcherClass}</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
