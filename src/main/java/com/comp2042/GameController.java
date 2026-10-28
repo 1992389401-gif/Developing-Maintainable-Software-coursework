@@ -53,7 +53,7 @@ public class GameController {
      * The timeline calls it a few times per second, depending on the game speed.
      */
     private void tick() {
-        if (snek.getDead()) {
+        if (snek.getDead() || game.gameWon()) {
             return;
         }
 
@@ -63,10 +63,10 @@ public class GameController {
             powerCoin();
             game.incScore();
             if (game.gameWon()) {
-                gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
-                return;
+                animation.stop();
+            } else {
+                newCoin();
             }
-            newCoin();
         }
 
         keyPressed = false;
