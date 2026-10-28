@@ -1,7 +1,5 @@
 package com.comp2042;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
 import java.awt.*;
@@ -18,14 +16,6 @@ public class Snake {
     private boolean ignoreBorders = false;
     private boolean noBorder;
     private Obstacle obstacle;
-    private Image imgInputHead = new Image("resources/views/res/snakehead.png");
-    private ImageView imageHead = new ImageView(imgInputHead);
-    private Image imgInputBody = new Image("resources/views/res/snakebody.png");
-    private ImageView imageBody = new ImageView(imgInputBody);
-    private Image imgInputTurn = new Image("resources/views/res/snaketurnleft.png");
-    private ImageView imageTurn = new ImageView(imgInputTurn);
-    private Image imgInputTail = new Image("resources/views/res/snaketail.png");
-    private ImageView imageTail = new ImageView(imgInputTail);
     private int snakeDir = 270;
 
     public Snake(int x, int y, boolean noBorder, Obstacle obstacle) {
@@ -139,23 +129,7 @@ public class Snake {
         ignoreBorders = ign;
     }
 
-    public ImageView getImageViewHead() {
-        return imageHead;
-    }
-
-    public ImageView getImageViewBody() {
-        return imageBody;
-    }
-
-    public ImageView getImageViewTurn() {
-        return imageTurn;
-    }
-
     public int getSnakeDir() {
         return snakeDir;
-    }
-
-    public ImageView getImageViewTail() {
-        return imageTail;
     }
 }

@@ -1,13 +1,10 @@
 package com.comp2042;
 
-import javafx.scene.image.Image;
-
 import java.awt.*;
 import java.util.Random;
 
 public class Coin {
     private Point pos;
-    private Image image = new Image("resources/views/res/redcoin.png");
 
     public Coin(int x, int y, Snake snek, Obstacle obstacle) {
         int tx;
@@ -30,7 +27,12 @@ public class Coin {
         return points;
     }
 
-    public Image getImage() {
-        return image;
+    /**
+     * Returns the kind of this coin. The view uses it to choose the sprite to draw.
+     *
+     * @return {@link CoinType#RED} for a plain coin
+     */
+    public CoinType getType() {
+        return CoinType.RED;
     }
 }
