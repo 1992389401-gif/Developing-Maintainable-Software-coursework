@@ -44,7 +44,7 @@ public class Snake {
             head.setLocation(Math.floorMod(head.x, gx), Math.floorMod(head.y, gy));
         }
 
-        if (body.size() > 4 && hitSelf() && !body.get(0).equals(head)) {
+        if (hitSelf() && !body.get(0).equals(head)) {
             dead = true;
         }
     }

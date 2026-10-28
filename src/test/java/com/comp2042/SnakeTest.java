@@ -188,6 +188,20 @@ class SnakeTest {
         assertTrue(snake.getDead());
     }
 
+    /**
+     * Regression test for B10: self-collision was only checked for snakes longer than four
+     * cells, so together with B1/B3 a short snake could reverse straight through itself.
+     */
+    @Test
+    void aShortSnakeDiesWhenDrivenBackIntoItsBody() {
+        Snake snake = new Snake(SIZE, SIZE, false, obstacle);
+        step(snake, Direction.LEFT, new Coin(new Point(9, 10)));   // length 3, head at (9,10)
+
+        step(snake, Direction.RIGHT, farCoin);                     // into (10,10), which is not the tail
+
+        assertTrue(snake.getDead());
+    }
+
     @Test
     void mayMoveIntoTheCellItsTailIsLeaving() {
         Snake snake = new Snake(SIZE, SIZE, false, obstacle);
