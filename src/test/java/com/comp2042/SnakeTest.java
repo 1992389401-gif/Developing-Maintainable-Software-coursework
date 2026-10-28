@@ -162,6 +162,23 @@ class SnakeTest {
         assertEquals(new Point(19, 10), snake.getHead());
     }
 
+    /**
+     * Regression test for B15: after wrapping to the opposite edge, the cell the head landed
+     * on was never checked for an obstacle, so the snake passed through it.
+     */
+    @Test
+    void wrappingOntoAnObstacleKillsTheSnake() {
+        obstacle.getObstacles().add(new Point(19, 10));
+        Snake snake = new Snake(SIZE, SIZE, true, obstacle);
+        steps(snake, Direction.LEFT, farCoin, 10);   // head at the left edge, (0,10)
+        assertFalse(snake.getDead());
+
+        step(snake, Direction.LEFT, farCoin);        // wraps to (19,10), the obstacle
+
+        assertTrue(snake.getDead());
+        assertEquals(new Point(0, 10), snake.getHead());
+    }
+
     @Test
     void runningIntoAnObstacleKillsTheSnake() {
         obstacle.getObstacles().add(new Point(9, 10));

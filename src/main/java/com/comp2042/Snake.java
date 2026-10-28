@@ -34,14 +34,22 @@ public class Snake {
      * @param direction the direction to move in
      */
     public void move(Direction direction) {
-        body.add(new Point(head));
+        Point previous = new Point(head);
+        body.add(previous);
         heading = direction;
         head.translate(direction.getDx(), direction.getDy());
-        if (borderControl() && (!ignoreBorders && !noBorder) || obstacle.getObstacles().contains(head)) {
-            head.translate(-direction.getDx(), -direction.getDy());
+        if (borderControl()) {
+            if (ignoreBorders || noBorder) {
+                head.setLocation(Math.floorMod(head.x, gx), Math.floorMod(head.y, gy));
+            } else {
+                head.setLocation(previous);
+                dead = true;
+            }
+        }
+        // Checked after wrapping, so an obstacle on the far edge is not skipped.
+        if (obstacle.getObstacles().contains(head)) {
+            head.setLocation(previous);
             dead = true;
-        } else if (borderControl() && (ignoreBorders || noBorder)) {
-            head.setLocation(Math.floorMod(head.x, gx), Math.floorMod(head.y, gy));
         }
 
         if (hitSelf() && !body.get(0).equals(head)) {
