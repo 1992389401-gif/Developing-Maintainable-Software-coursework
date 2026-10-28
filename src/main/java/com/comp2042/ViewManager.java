@@ -7,27 +7,39 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class ViewManager {
 
-    private Stage primaryStage = new Stage();
+    private static final String MAIN_MENU_FXML = "/resources/views/MainMenu.fxml";
+
+    private final Stage primaryStage;
     private AnchorPane root;
 
     private Stage gameStage;
 
     private Image snakeLogo = new Image("resources/views/res/SnakeLogoWhite.png");
 
-    public ViewManager() {
+    /**
+     * Creates the view manager for the window that JavaFX opened for the application.
+     *
+     * @param primaryStage the stage passed to {@link Main#start(Stage)}
+     */
+    public ViewManager(Stage primaryStage) {
+        this.primaryStage = primaryStage;
     }
 
-    public void initalizeMainMenu() {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(Main.class.getResource("/resources/views/MainMenu.fxml"));
-            root = loader.load();
-        } catch (IOException exception) {
-            exception.printStackTrace();
+    /**
+     * Loads the main menu from its FXML file and shows it in the primary stage.
+     *
+     * @throws IOException if the FXML file is missing or cannot be read
+     */
+    public void initializeMainMenu() throws IOException {
+        URL location = Main.class.getResource(MAIN_MENU_FXML);
+        if (location == null) {
+            throw new IOException("Main menu layout not found on the class path: " + MAIN_MENU_FXML);
         }
+        root = new FXMLLoader(location).load();
 
         Scene mainScene = new Scene(root);
 
