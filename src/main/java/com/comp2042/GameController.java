@@ -114,6 +114,7 @@ public class GameController {
         }
 
         if (event.getCode().equals(KeyCode.ESCAPE)) {
+            animation.stop();
             MainMenuController mainMenuController = new MainMenuController();
             mainMenuController.getViewManager().getPrimaryStage().show();
             mainMenuController.getViewManager().getGameStage().close();
