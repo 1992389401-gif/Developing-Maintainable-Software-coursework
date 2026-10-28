@@ -57,6 +57,23 @@ class SnakeTest {
         assertFalse(snake.canTurn(heading.opposite()));
     }
 
+    /**
+     * Regression test for B3: the heading used to live in static fields of GameController,
+     * so a new game inherited the direction of the previous one.
+     */
+    @Test
+    void everyNewSnakeStartsHeadingLeftWhateverEarlierSnakesDid() {
+        Snake earlier = new Snake(SIZE, SIZE, false, obstacle);
+        step(earlier, Direction.UP, farCoin);
+        step(earlier, Direction.RIGHT, farCoin);
+
+        Snake next = new Snake(SIZE, SIZE, false, obstacle);
+
+        assertEquals(Direction.LEFT, next.getHeading());
+        assertTrue(next.canTurn(Direction.LEFT));
+        assertFalse(next.canTurn(Direction.RIGHT));
+    }
+
     @ParameterizedTest(name = "heading {0} -> turning sideways or going on is allowed")
     @EnumSource(Direction.class)
     void canTurnSidewaysOrKeepGoing(Direction heading) {

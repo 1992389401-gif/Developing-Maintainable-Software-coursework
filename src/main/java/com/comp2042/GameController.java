@@ -22,8 +22,8 @@ public class GameController {
     private String coinSoundPath = "resources/views/res/coinSound.wav";
     private Obstacle obstacle;
 
-    public static KeyCode key = KeyCode.LEFT;
-    public static KeyCode lastKey = KeyCode.LEFT;
+    /** Where the snake moves on the next tick. Every game has its own, starting left. */
+    private Direction direction = Direction.LEFT;
     private boolean keyPressed = false;
 
     private int legacyScoreMultiplier = 2;
@@ -50,7 +50,7 @@ public class GameController {
             return;
         } else {
 
-            snek.move(KeyBindings.directionFor(key));
+            snek.move(direction);
 
             if (!snek.getDead() && snek.ateCoin(coin)) {
                 powerCoin();
@@ -79,10 +79,9 @@ public class GameController {
 
         Direction requested = KeyBindings.directionFor(event.getCode());
         if (requested != null && snek.canTurn(requested) && !keyPressed) {
-            lastKey = key;
-            key = event.getCode();
+            gameView.turnDir(snek, snek.getHeading(), requested);
+            direction = requested;
             keyPressed = true;
-            gameView.turnDir(snek);
         }
 
         if (event.getCode().equals(KeyCode.P)) {
@@ -126,7 +125,7 @@ public class GameController {
         int unusedObstacleCount = new Random().nextInt(game.getWidth() * game.getHeight() / 20) + 3;
 
         animation.setRate(game.getSpeed());
-        key = KeyCode.LEFT;
+        direction = Direction.LEFT;
         keyPressed = false;
         game.resetScore();
         obstacle.reset();
