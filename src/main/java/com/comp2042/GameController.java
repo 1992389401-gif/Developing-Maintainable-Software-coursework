@@ -5,12 +5,11 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.File;
+import java.net.URL;
 import java.util.Random;
 
 public class GameController {
@@ -19,7 +18,7 @@ public class GameController {
     private GameView gameView;
     private Game game;
     private Stage stage;
-    private String coinSoundPath = "resources/views/res/coinSound.wav";
+    private final AudioClip coinSound = loadSound("/resources/views/res/coinSound.wav");
     private Obstacle obstacle;
     private final CoinFactory coinFactory = new CoinFactory();
 
@@ -49,6 +48,22 @@ public class GameController {
     private final Timeline animation = new Timeline(new KeyFrame(Duration.seconds(1), event -> tick()));
 
     /**
+     * Loads a short sound effect from the class path. A missing file only produces a
+     * warning, so the game still runs without that sound.
+     *
+     * @param path the resource path of the sound file
+     * @return the loaded clip, or {@code null} if the file was not found
+     */
+    private static AudioClip loadSound(String path) {
+        URL url = GameController.class.getResource(path);
+        if (url == null) {
+            System.err.println("Sound not found: " + path);
+            return null;
+        }
+        return new AudioClip(url.toExternalForm());
+    }
+
+    /**
      * Advances the game by one step: moves the snake, handles an eaten coin and redraws.
      * The timeline calls it a few times per second, depending on the game speed.
      */
@@ -60,6 +75,9 @@ public class GameController {
         snek.move(direction);
 
         if (!snek.getDead() && snek.ateCoin(coin)) {
+            if (coinSound != null) {
+                coinSound.play();
+            }
             powerCoin();
             game.incScore();
             if (game.gameWon()) {
