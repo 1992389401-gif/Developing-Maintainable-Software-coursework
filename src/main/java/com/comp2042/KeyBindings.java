@@ -26,4 +26,27 @@ public final class KeyBindings {
             default -> null;
         };
     }
+
+    /**
+     * Tells whether a key switches the game to full screen. Keyboards report the "+" key in
+     * different ways: PLUS on layouts with a separate "+" key, EQUALS on US-style layouts
+     * (where "+" is Shift and "="), and ADD on the numeric keypad, so all three count.
+     *
+     * @param code the key that was pressed
+     * @return {@code true} for a "+" key
+     */
+    public static boolean entersFullScreen(KeyCode code) {
+        return code == KeyCode.PLUS || code == KeyCode.EQUALS || code == KeyCode.ADD;
+    }
+
+    /**
+     * Tells whether a key switches the game back to a window: "-" on the main keyboard
+     * (MINUS) or on the numeric keypad (SUBTRACT).
+     *
+     * @param code the key that was pressed
+     * @return {@code true} for a "-" key
+     */
+    public static boolean leavesFullScreen(KeyCode code) {
+        return code == KeyCode.MINUS || code == KeyCode.SUBTRACT;
+    }
 }
