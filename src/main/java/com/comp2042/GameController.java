@@ -26,13 +26,6 @@ public class GameController {
     private Direction direction = Direction.LEFT;
     private boolean keyPressed = false;
 
-    private int legacyScoreMultiplier = 2;
-
-    private void calculateBonusScore() {
-        int bonus = game.getScorePoints() * legacyScoreMultiplier;
-        System.out.println("Bonus score: " + bonus);
-    }
-
     public GameController(Snake snek, Coin coin, Game game, GameView gameView, Obstacle obstacle, Stage stage) {
         this.snek = snek;
         this.coin = coin;
@@ -90,7 +83,7 @@ public class GameController {
         keyPressed = false;
 
         if (!snek.getDead() || snek.hitSelf()) {
-            gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
+            gameView.drawGrid(coin, snek, obstacle);
         }
 
         gameView.gameWon();
@@ -147,8 +140,6 @@ public class GameController {
         snek = new Snake(game.getWidth(), game.getHeight(), game.isNoBorder(), obstacle);
         coin = new Coin(game.getWidth(), game.getHeight(), snek, obstacle);
 
-        int unusedObstacleCount = new Random().nextInt(game.getWidth() * game.getHeight() / 20) + 3;
-
         animation.setRate(game.getSpeed());
         direction = Direction.LEFT;
         keyPressed = false;
@@ -160,7 +151,7 @@ public class GameController {
         gameView.gameOver(snek);
         gameView.updateScoreLabel();
 
-        gameView.drawGrid(coin, snek, obstacle, gameView.gc, false, 0);
+        gameView.drawGrid(coin, snek, obstacle);
     }
 
     private void powerCoin() {

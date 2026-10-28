@@ -1,6 +1,6 @@
 package com.comp2042;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
