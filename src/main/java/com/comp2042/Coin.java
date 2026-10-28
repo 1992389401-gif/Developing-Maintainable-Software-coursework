@@ -18,6 +18,16 @@ public class Coin {
         } while (snek.getHead().equals(pos) || snek.getBody().contains(pos) || obstacle.getObstacles().contains(pos));
     }
 
+    /**
+     * Creates a coin on a given cell. Unit tests use it to put a coin exactly where the
+     * snake will move next.
+     *
+     * @param pos the cell the coin occupies
+     */
+    Coin(Point pos) {
+        this.pos = new Point(pos);
+    }
+
     public Point getPos() {
         return new Point(pos);
     }
