@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 
 import java.awt.Point;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GameView {
@@ -39,6 +40,7 @@ public class GameView {
     private final ImageView turnSprite = new ImageView(new Image("resources/views/res/snaketurnleft.png"));
     private final ImageView tailSprite = new ImageView(new Image("resources/views/res/snaketail.png"));
     private final Map<CoinType, Image> coinSprites = loadCoinSprites();
+    private final Map<ImageView, Map<Integer, Image>> rotatedSprites = new HashMap<>();
 
     public GameView(Game game) {
         this.game = game;
@@ -157,21 +159,34 @@ public class GameView {
         };
     }
 
+    /**
+     * Returns a sprite rendered at the given rotation. Taking a snapshot of a node is slow and
+     * the snake needs one image per segment in every frame, so each rotation of a sprite is
+     * rendered only once and then reused.
+     *
+     * @param sprite  the sprite to rotate
+     * @param degrees the clockwise rotation in degrees
+     * @return the rotated image, with a transparent background
+     */
+    private Image rotated(ImageView sprite, int degrees) {
+        Map<Integer, Image> byRotation = rotatedSprites.computeIfAbsent(sprite, key -> new HashMap<>());
+        return byRotation.computeIfAbsent(degrees, key -> {
+            sprite.setRotate(degrees);
+            SnapshotParameters params = new SnapshotParameters();
+            params.setFill(Color.TRANSPARENT);
+            return sprite.snapshot(params, null);
+        });
+    }
+
     private void drawHead(Snake snake) {
-        headSprite.setRotate(rotationOf(snake.getHeading()));
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);
-        Image rotatedImage = headSprite.snapshot(params, null);
+        Image rotatedImage = rotated(headSprite, rotationOf(snake.getHeading()));
         gc.drawImage(rotatedImage, (snake.getHead().x * game.getCellSize()) * fullScale, (snake.getHead().y * game.getCellSize()) * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
     }
 
     private void drawBody(Snake snake, Point point, int index) {
         Image rotatedImage;
         if (snake.getBody().size() <= 1) {
-            tailSprite.setRotate(rotationOf(snake.getHeading()));
-            SnapshotParameters params = new SnapshotParameters();
-            params.setFill(Color.TRANSPARENT);
-            rotatedImage = tailSprite.snapshot(params, null);
+            rotatedImage = rotated(tailSprite, rotationOf(snake.getHeading()));
         } else if (index == 0) {
             int rotateTail;
             if (snake.getBody().get(1).getX() == snake.getBody().get(0).getX() && snake.getBody().get(1).getY() == snake.getBody().get(0).getY() - 1) {
@@ -183,20 +198,11 @@ public class GameView {
             } else {
                 rotateTail = 90;
             }
-            tailSprite.setRotate(rotateTail);
-            SnapshotParameters params = new SnapshotParameters();
-            params.setFill(Color.TRANSPARENT);
-            rotatedImage = tailSprite.snapshot(params, null);
+            rotatedImage = rotated(tailSprite, rotateTail);
         } else if (index > 0 && (turnArray[(int) snake.getBody().get(index).getX()][(int) snake.getBody().get(index).getY()] != 0)) {
-            turnSprite.setRotate(90 * turnArray[(int) snake.getBody().get(index).getX()][(int) snake.getBody().get(index).getY()]);
-            SnapshotParameters params = new SnapshotParameters();
-            params.setFill(Color.TRANSPARENT);
-            rotatedImage = turnSprite.snapshot(params, null);
+            rotatedImage = rotated(turnSprite, 90 * turnArray[(int) snake.getBody().get(index).getX()][(int) snake.getBody().get(index).getY()]);
         } else {
-            bodySprite.setRotate(snake.getBodyDir(index));
-            SnapshotParameters params = new SnapshotParameters();
-            params.setFill(Color.TRANSPARENT);
-            rotatedImage = bodySprite.snapshot(params, null);
+            rotatedImage = rotated(bodySprite, snake.getBodyDir(index));
         }
 
         if (turnArray[(int) snake.getBody().get(0).getX()][(int) snake.getBody().get(0).getY()] != 0) {
