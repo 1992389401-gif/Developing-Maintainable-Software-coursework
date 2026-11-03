@@ -1,12 +1,12 @@
 package com.comp2042;
 
-import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Snake {
     private boolean dead = false;
-    private final Point head = new Point();
-    private final ArrayList<Point> body = new ArrayList<>();
+    private Position head;
+    private final List<Position> body = new ArrayList<>();
     private final int width;
     private final int height;
     private boolean ignoreBorders = false;
@@ -17,8 +17,8 @@ public class Snake {
     public Snake(int x, int y, boolean noBorder, Obstacle obstacle) {
         this.obstacle = obstacle;
         this.noBorder = noBorder;
-        this.head.setLocation(x / 2, y / 2);
-        this.body.add(new Point(x / 2 + 1, y / 2));
+        this.head = new Position(x / 2, y / 2);
+        this.body.add(new Position(x / 2 + 1, y / 2));
         this.width = x;
         this.height = y;
     }
@@ -30,21 +30,21 @@ public class Snake {
      * @param direction the direction to move in
      */
     public void move(Direction direction) {
-        Point previous = new Point(head);
+        Position previous = head;
         body.add(previous);
         heading = direction;
-        head.translate(direction.getDx(), direction.getDy());
-        if (borderControl()) {
+        head = head.step(direction);
+        if (!head.isInside(width, height)) {
             if (ignoreBorders || noBorder) {
-                head.setLocation(Math.floorMod(head.x, width), Math.floorMod(head.y, height));
+                head = head.wrap(width, height);
             } else {
-                head.setLocation(previous);
+                head = previous;
                 dead = true;
             }
         }
         // Checked after wrapping, so an obstacle on the far edge is not skipped.
         if (obstacle.getObstacles().contains(head)) {
-            head.setLocation(previous);
+            head = previous;
             dead = true;
         }
 
@@ -68,7 +68,7 @@ public class Snake {
     public int getBodyDir(int bodyCount) {
         if (bodyCount == 0) {
             return 0;
-        } else if (body.get(bodyCount).getY() == body.get(bodyCount - 1).getY()) {
+        } else if (body.get(bodyCount).y() == body.get(bodyCount - 1).y()) {
             return 270;
         } else {
             return 0;
@@ -82,20 +82,26 @@ public class Snake {
         return head.equals(coin.getPos());
     }
 
-    private boolean borderControl() {
-        return head.getX() < 0 || head.getY() < 0 || head.getX() >= width || head.getY() >= height;
-    }
-
     public boolean hitSelf() {
         return body.contains(head);
     }
 
-    public ArrayList<Point> getBody() {
-        return new ArrayList<>(body);
+    /**
+     * Returns the body cells, from the tail up to the cell behind the head.
+     *
+     * @return an unmodifiable copy of the body
+     */
+    public List<Position> getBody() {
+        return List.copyOf(body);
     }
 
-    public Point getHead() {
-        return new Point(head);
+    /**
+     * Returns the cell of the head. Positions are immutable, so no copy is needed.
+     *
+     * @return the head position
+     */
+    public Position getHead() {
+        return head;
     }
 
     public boolean isDead() {

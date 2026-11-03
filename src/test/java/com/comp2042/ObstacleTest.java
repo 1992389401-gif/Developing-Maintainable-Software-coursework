@@ -2,7 +2,6 @@ package com.comp2042;
 
 import org.junit.jupiter.api.Test;
 
-import java.awt.Point;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -18,7 +17,7 @@ class ObstacleTest {
 
     private final Obstacle obstacle = new Obstacle(20, 20);
     private final Snake snake = new Snake(20, 20, false, obstacle);
-    private final Coin coin = new Coin(new Point(3, 3));
+    private final Coin coin = new Coin(new Position(3, 3));
 
     @Test
     void startsWithoutObstacles() {
@@ -36,7 +35,7 @@ class ObstacleTest {
     void obstaclesAvoidTheSnakeAndTheCoin() {
         obstacle.newObstacles(snake, coin, 40);
 
-        for (Point p : obstacle.getObstacles()) {
+        for (Position p : obstacle.getObstacles()) {
             assertFalse(p.equals(snake.getHead()) || snake.getBody().contains(p) || p.equals(coin.getPos()),
                     "obstacle placed on an occupied cell: " + p);
         }
@@ -47,8 +46,8 @@ class ObstacleTest {
     void obstaclesStayOnTheBoard() {
         obstacle.newObstacles(snake, coin, 200);
 
-        for (Point p : obstacle.getObstacles()) {
-            assertTrue(p.x >= 0 && p.x < 20 && p.y >= 0 && p.y < 20, "off the board: " + p);
+        for (Position p : obstacle.getObstacles()) {
+            assertTrue(p.x() >= 0 && p.x() < 20 && p.y() >= 0 && p.y() < 20, "off the board: " + p);
         }
     }
 
@@ -65,7 +64,7 @@ class ObstacleTest {
     void theFirstColumnCanGetObstacles() {
         obstacle.newObstacles(snake, coin, 400);
 
-        assertTrue(obstacle.getObstacles().stream().anyMatch(p -> p.x == 0));
+        assertTrue(obstacle.getObstacles().stream().anyMatch(p -> p.x() == 0));
     }
 
     /** Regression test for B6: an obstacle could appear right in front of the head. */
@@ -75,7 +74,7 @@ class ObstacleTest {
 
         // A new snake heads left from (10,10).
         for (int x = 7; x <= 9; x++) {
-            assertFalse(obstacle.getObstacles().contains(new Point(x, 10)), "blocked: (" + x + ",10)");
+            assertFalse(obstacle.getObstacles().contains(new Position(x, 10)), "blocked: (" + x + ",10)");
         }
     }
 
