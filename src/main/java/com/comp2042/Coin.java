@@ -1,12 +1,11 @@
 package com.comp2042;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class Coin {
-    private Point pos;
+    private Position pos;
 
     /**
      * Creates a coin on a random cell that is not covered by the snake or an obstacle.
@@ -18,11 +17,11 @@ public class Coin {
      * @throws IllegalStateException if no cell is free; the game should have been won by then
      */
     public Coin(int x, int y, Snake snake, Obstacle obstacle) {
-        List<Point> body = snake.getBody();
-        List<Point> free = new ArrayList<>();
+        List<Position> body = snake.getBody();
+        List<Position> free = new ArrayList<>();
         for (int px = 0; px < x; px++) {
             for (int py = 0; py < y; py++) {
-                Point p = new Point(px, py);
+                Position p = new Position(px, py);
                 if (!p.equals(snake.getHead()) && !body.contains(p) && !obstacle.getObstacles().contains(p)) {
                     free.add(p);
                 }
@@ -40,12 +39,12 @@ public class Coin {
      *
      * @param pos the cell the coin occupies
      */
-    Coin(Point pos) {
-        this.pos = new Point(pos);
+    Coin(Position pos) {
+        this.pos = pos;
     }
 
-    public Point getPos() {
-        return new Point(pos);
+    public Position getPos() {
+        return pos;
     }
 
     public int getPoints() {

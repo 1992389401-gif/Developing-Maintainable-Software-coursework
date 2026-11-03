@@ -2,7 +2,6 @@ package com.comp2042;
 
 import org.junit.jupiter.api.Test;
 
-import java.awt.Point;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,29 +22,29 @@ class CoinTest {
 
         Coin coin = new Coin(3, 1, snake, obstacle);
 
-        assertEquals(new Point(0, 0), coin.getPos());
+        assertEquals(new Position(0, 0), coin.getPos());
     }
 
     @Test
     void neverSpawnsOnAnObstacle() {
         // On a 3x3 board the snake covers (1,1) and (2,1); obstacles fill all but (2,2).
         Obstacle obstacle = new Obstacle(3, 3);
-        for (Point p : new Point[]{new Point(0, 0), new Point(1, 0), new Point(2, 0),
-                new Point(0, 1), new Point(0, 2), new Point(1, 2)}) {
+        for (Position p : new Position[]{new Position(0, 0), new Position(1, 0), new Position(2, 0),
+                new Position(0, 1), new Position(0, 2), new Position(1, 2)}) {
             obstacle.getObstacles().add(p);
         }
         Snake snake = new Snake(3, 3, false, obstacle);
 
         Coin coin = new Coin(3, 3, snake, obstacle);
 
-        assertEquals(new Point(2, 2), coin.getPos());
+        assertEquals(new Position(2, 2), coin.getPos());
     }
 
     /** Regression test for B7: with no free cell left, the constructor used to loop forever. */
     @Test
     void refusesToSpawnOnAFullBoardInsteadOfHanging() {
         Obstacle obstacle = new Obstacle(3, 1);
-        obstacle.getObstacles().add(new Point(0, 0));   // the one cell the snake leaves free
+        obstacle.getObstacles().add(new Position(0, 0));   // the one cell the snake leaves free
         Snake snake = new Snake(3, 1, false, obstacle);
 
         assertTimeoutPreemptively(Duration.ofSeconds(2),

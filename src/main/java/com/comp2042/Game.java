@@ -1,12 +1,9 @@
 package com.comp2042;
 
-import javafx.scene.paint.Color;
-
 public class Game {
     /** A new snake covers two cells: its head and one body segment. */
     private static final int START_LENGTH = 2;
 
-    private Color color = Color.web("feffe4");
     private int width;
     private int height;
     private int score;
@@ -72,10 +69,6 @@ public class Game {
         score = 0;
         scorePoints = 0;
         maxScore = width * height - START_LENGTH;
-    }
-
-    public Color getColor() {
-        return color;
     }
 
     public double getCellSize() {

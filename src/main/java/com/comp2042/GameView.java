@@ -12,12 +12,16 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.awt.Point;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GameView {
+
+    /** Colour of the empty board. */
+    private static final Color BOARD_COLOR = Color.web("feffe4");
+    /** Colour of an obstacle cell. */
+    private static final Color OBSTACLE_COLOR = Color.BLACK;
 
     public Canvas gridCanvas;
     public GraphicsContext gc;
@@ -124,22 +128,22 @@ public class GameView {
     }
 
     public void drawGrid(Coin coin, Snake snake, Obstacle obstacle) {
-        gc.setFill(game.getColor());
+        gc.setFill(BOARD_COLOR);
         gc.fillRect(0, 0, gridCanvas.getWidth(), gridCanvas.getHeight());
 
-        gc.drawImage(coinSprites.get(coin.getType()), (coin.getPos().x * game.getCellSize()) * fullScale, (coin.getPos().y * game.getCellSize()) * fullScale, game.getCellSize() * fullScale - 3 * fullScale, game.getCellSize() * fullScale - 3 * fullScale);
+        gc.drawImage(coinSprites.get(coin.getType()), (coin.getPos().x() * game.getCellSize()) * fullScale, (coin.getPos().y() * game.getCellSize()) * fullScale, game.getCellSize() * fullScale - 3 * fullScale, game.getCellSize() * fullScale - 3 * fullScale);
 
         int bodyIndex = 0;
-        for (Point point : snake.getBody()) {
+        for (Position point : snake.getBody()) {
             drawBody(snake, point, bodyIndex);
             bodyIndex++;
         }
 
         drawHead(snake);
 
-        gc.setFill(obstacle.getColor());
-        for (Point point : obstacle.getObstacles()) {
-            gc.fillRect(point.x * game.getCellSize() * fullScale, point.y * game.getCellSize() * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
+        gc.setFill(OBSTACLE_COLOR);
+        for (Position point : obstacle.getObstacles()) {
+            gc.fillRect(point.x() * game.getCellSize() * fullScale, point.y() * game.getCellSize() * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
         }
     }
 
@@ -180,36 +184,36 @@ public class GameView {
 
     private void drawHead(Snake snake) {
         Image rotatedImage = rotated(headSprite, rotationOf(snake.getHeading()));
-        gc.drawImage(rotatedImage, (snake.getHead().x * game.getCellSize()) * fullScale, (snake.getHead().y * game.getCellSize()) * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
+        gc.drawImage(rotatedImage, (snake.getHead().x() * game.getCellSize()) * fullScale, (snake.getHead().y() * game.getCellSize()) * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
     }
 
-    private void drawBody(Snake snake, Point point, int index) {
+    private void drawBody(Snake snake, Position point, int index) {
         Image rotatedImage;
         if (snake.getBody().size() <= 1) {
             rotatedImage = rotated(tailSprite, rotationOf(snake.getHeading()));
         } else if (index == 0) {
             int rotateTail;
-            if (snake.getBody().get(1).getX() == snake.getBody().get(0).getX() && snake.getBody().get(1).getY() == snake.getBody().get(0).getY() - 1) {
+            if (snake.getBody().get(1).x() == snake.getBody().get(0).x() && snake.getBody().get(1).y() == snake.getBody().get(0).y() - 1) {
                 rotateTail = 0;
-            } else if (snake.getBody().get(1).getX() == snake.getBody().get(0).getX() && snake.getBody().get(1).getY() == snake.getBody().get(0).getY() + 1) {
+            } else if (snake.getBody().get(1).x() == snake.getBody().get(0).x() && snake.getBody().get(1).y() == snake.getBody().get(0).y() + 1) {
                 rotateTail = 180;
-            } else if (snake.getBody().get(1).getX() == snake.getBody().get(0).getX() - 1 && snake.getBody().get(1).getY() == snake.getBody().get(0).getY()) {
+            } else if (snake.getBody().get(1).x() == snake.getBody().get(0).x() - 1 && snake.getBody().get(1).y() == snake.getBody().get(0).y()) {
                 rotateTail = 270;
             } else {
                 rotateTail = 90;
             }
             rotatedImage = rotated(tailSprite, rotateTail);
-        } else if (index > 0 && (turnArray[(int) snake.getBody().get(index).getX()][(int) snake.getBody().get(index).getY()] != 0)) {
-            rotatedImage = rotated(turnSprite, 90 * turnArray[(int) snake.getBody().get(index).getX()][(int) snake.getBody().get(index).getY()]);
+        } else if (index > 0 && (turnArray[snake.getBody().get(index).x()][snake.getBody().get(index).y()] != 0)) {
+            rotatedImage = rotated(turnSprite, 90 * turnArray[snake.getBody().get(index).x()][snake.getBody().get(index).y()]);
         } else {
             rotatedImage = rotated(bodySprite, snake.getBodyDir(index));
         }
 
-        if (turnArray[(int) snake.getBody().get(0).getX()][(int) snake.getBody().get(0).getY()] != 0) {
-            turnArray[(int) snake.getBody().get(0).getX()][(int) snake.getBody().get(0).getY()] = 0;
+        if (turnArray[snake.getBody().get(0).x()][snake.getBody().get(0).y()] != 0) {
+            turnArray[snake.getBody().get(0).x()][snake.getBody().get(0).y()] = 0;
         }
 
-        gc.drawImage(rotatedImage, (point.x * game.getCellSize()) * fullScale, (point.y * game.getCellSize()) * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
+        gc.drawImage(rotatedImage, (point.x() * game.getCellSize()) * fullScale, (point.y() * game.getCellSize()) * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
     }
 
     /**
@@ -221,14 +225,14 @@ public class GameView {
      */
     public void turnDir(Snake snake, Direction from, Direction to) {
         if ((from == Direction.LEFT && to == Direction.UP) || (from == Direction.DOWN && to == Direction.RIGHT)) {
-            turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 2;
+            turnArray[snake.getHead().x()][snake.getHead().y()] = 2;
         } else if ((from == Direction.LEFT && to == Direction.DOWN) || (from == Direction.UP && to == Direction.RIGHT)) {
-            turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 3;
+            turnArray[snake.getHead().x()][snake.getHead().y()] = 3;
         } else if ((from == Direction.RIGHT && to == Direction.UP) || (from == Direction.DOWN && to == Direction.LEFT)) {
-            turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 1;
+            turnArray[snake.getHead().x()][snake.getHead().y()] = 1;
         } else if ((from == Direction.UP && to == Direction.LEFT) || (from == Direction.RIGHT && to == Direction.DOWN)) {
-            turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 4;
-        } else turnArray[(int) snake.getHead().getX()][(int) snake.getHead().getY()] = 0;
+            turnArray[snake.getHead().x()][snake.getHead().y()] = 4;
+        } else turnArray[snake.getHead().x()][snake.getHead().y()] = 0;
     }
 
     public void gameOver(Snake snake) {

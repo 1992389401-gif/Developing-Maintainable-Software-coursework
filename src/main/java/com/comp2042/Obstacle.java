@@ -1,8 +1,5 @@
 package com.comp2042;
 
-import javafx.scene.paint.Color;
-
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,8 +9,7 @@ public class Obstacle {
     /** How many cells straight ahead of the snake's head stay free of new obstacles. */
     static final int SAFE_DISTANCE = 3;
 
-    private Color color = Color.BLACK;
-    private ArrayList<Point> obstacles = new ArrayList<>();
+    private final List<Position> obstacles = new ArrayList<>();
     private int x;
     private int y;
     private final Random random;
@@ -49,12 +45,12 @@ public class Obstacle {
         if (obstacles.size() > 50) {
             return 0;
         }
-        List<Point> body = snake.getBody();
-        List<Point> ahead = cellsAhead(snake);
-        List<Point> free = new ArrayList<>();
+        List<Position> body = snake.getBody();
+        List<Position> ahead = cellsAhead(snake);
+        List<Position> free = new ArrayList<>();
         for (int px = 0; px < x; px++) {
             for (int py = 0; py < y; py++) {
-                Point p = new Point(px, py);
+                Position p = new Position(px, py);
                 boolean taken = obstacles.contains(p) || p.equals(coin.getPos()) || p.equals(snake.getHead())
                         || body.contains(p) || ahead.contains(p);
                 if (!taken) {
@@ -74,22 +70,17 @@ public class Obstacle {
      * @param snake the snake
      * @return the next {@value #SAFE_DISTANCE} cells in the snake's heading
      */
-    private List<Point> cellsAhead(Snake snake) {
-        List<Point> cells = new ArrayList<>();
-        Point p = snake.getHead();
-        Direction heading = snake.getHeading();
+    private List<Position> cellsAhead(Snake snake) {
+        List<Position> cells = new ArrayList<>();
+        Position p = snake.getHead();
         for (int i = 0; i < SAFE_DISTANCE; i++) {
-            p = new Point(Math.floorMod(p.x + heading.getDx(), x), Math.floorMod(p.y + heading.getDy(), y));
+            p = p.step(snake.getHeading()).wrap(x, y);
             cells.add(p);
         }
         return cells;
     }
 
-    public Color getColor() {
-        return color;
-    }
-
-    public ArrayList<Point> getObstacles() {
+    public List<Position> getObstacles() {
         return obstacles;
     }
 
