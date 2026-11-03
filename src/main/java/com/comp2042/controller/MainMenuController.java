@@ -1,0 +1,63 @@
+package com.comp2042.controller;
+
+import com.comp2042.app.Main;
+import com.comp2042.model.Coin;
+import com.comp2042.model.Difficulty;
+import com.comp2042.model.Game;
+import com.comp2042.model.Obstacle;
+import com.comp2042.model.Snake;
+import com.comp2042.view.GameView;
+import com.comp2042.view.ViewManager;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
+public class MainMenuController {
+
+    private static final int X_VALUE = 20;
+    private static final int Y_VALUE = 20;
+    private static final boolean POWER_UP = true;
+    private static final Difficulty DIFFICULTY = Difficulty.NORMAL;
+
+    private Scene gameScene;
+
+    private ViewManager viewManager = Main.getViewManager();
+
+    public void handleStart() {
+        viewManager.initGameStage();
+
+        Stage gameStage = viewManager.getGameStage();
+        launchSnake(gameStage);
+        gameStage.setScene(gameScene);
+        viewManager.getPrimaryStage().close();
+        gameStage.show();
+    }
+
+    private void launchSnake(Stage gameStage) {
+        Game game = new Game(X_VALUE, Y_VALUE, POWER_UP, DIFFICULTY);
+        Obstacle obstacle = new Obstacle(game.getWidth(), game.getHeight());
+        Snake snake = new Snake(game.getWidth(), game.getHeight(), game.isNoBorder(), obstacle);
+        Coin coin = new Coin(game.getWidth(), game.getHeight(), snake, obstacle);
+
+        GameView gameView = new GameView(game);
+        GameController controller = new GameController(snake, coin, game, gameView, obstacle, gameStage);
+
+        StackPane gamePane = new StackPane();
+        gameScene = new Scene(gamePane, game.getWidth() * game.getCellSize(), game.getHeight() * game.getCellSize());
+
+        gameScene.setOnKeyPressed(controller::handle);
+
+        gameView.makeScene(gameScene, snake, coin, obstacle);
+        gamePane.getChildren().addAll(gameView.gridCanvas, gameView.gameOverLabel, gameView.gameWonLabel, gameView.scoreLabel);
+        gamePane.setPadding(new Insets(20));
+        gamePane.setAlignment(gameView.gameOverLabel, Pos.TOP_CENTER);
+        gamePane.setAlignment(gameView.gameWonLabel, Pos.TOP_CENTER);
+        gamePane.setAlignment(gameView.scoreLabel, Pos.BOTTOM_CENTER);
+    }
+
+    public ViewManager getViewManager() {
+        return viewManager;
+    }
+}
