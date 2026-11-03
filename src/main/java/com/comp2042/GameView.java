@@ -18,6 +18,11 @@ import java.util.Map;
 
 public class GameView {
 
+    /** Colour of the empty board. */
+    private static final Color BOARD_COLOR = Color.web("feffe4");
+    /** Colour of an obstacle cell. */
+    private static final Color OBSTACLE_COLOR = Color.BLACK;
+
     public Canvas gridCanvas;
     public GraphicsContext gc;
 
@@ -123,7 +128,7 @@ public class GameView {
     }
 
     public void drawGrid(Coin coin, Snake snake, Obstacle obstacle) {
-        gc.setFill(game.getColor());
+        gc.setFill(BOARD_COLOR);
         gc.fillRect(0, 0, gridCanvas.getWidth(), gridCanvas.getHeight());
 
         gc.drawImage(coinSprites.get(coin.getType()), (coin.getPos().x() * game.getCellSize()) * fullScale, (coin.getPos().y() * game.getCellSize()) * fullScale, game.getCellSize() * fullScale - 3 * fullScale, game.getCellSize() * fullScale - 3 * fullScale);
@@ -136,7 +141,7 @@ public class GameView {
 
         drawHead(snake);
 
-        gc.setFill(obstacle.getColor());
+        gc.setFill(OBSTACLE_COLOR);
         for (Position point : obstacle.getObstacles()) {
             gc.fillRect(point.x() * game.getCellSize() * fullScale, point.y() * game.getCellSize() * fullScale, game.getCellSize() * fullScale, game.getCellSize() * fullScale);
         }

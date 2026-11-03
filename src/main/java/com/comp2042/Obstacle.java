@@ -1,7 +1,5 @@
 package com.comp2042;
 
-import javafx.scene.paint.Color;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +9,6 @@ public class Obstacle {
     /** How many cells straight ahead of the snake's head stay free of new obstacles. */
     static final int SAFE_DISTANCE = 3;
 
-    private Color color = Color.BLACK;
     private final List<Position> obstacles = new ArrayList<>();
     private int x;
     private int y;
@@ -81,10 +78,6 @@ public class Obstacle {
             cells.add(p);
         }
         return cells;
-    }
-
-    public Color getColor() {
-        return color;
     }
 
     public List<Position> getObstacles() {
